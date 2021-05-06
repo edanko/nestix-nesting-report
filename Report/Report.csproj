@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<AssemblyName>report</AssemblyName>
+		<GenerateAssemblyInfo>True</GenerateAssemblyInfo>
+		<Platforms>x64</Platforms>
+		<LangVersion>latest</LangVersion>
+		<ApplicationIcon>1.ico</ApplicationIcon>
+		<UseWPF>true</UseWPF>
+		<OutputType>WinExe</OutputType>
+		<StartupObject>Report.App</StartupObject>
+		<TargetFramework>net5.0-windows</TargetFramework>
+		<IsPackable>false</IsPackable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="itext7" Version="7.1.15" />
+		<PackageReference Include="System.Configuration.ConfigurationManager" Version="5.0.0" />
+		<PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
+		<PackageReference Include="System.Resources.Extensions" Version="5.0.0" />
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\NxlReader\NxlReader.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Resource Include="Forms\1.ico" />
+	</ItemGroup>
+</Project>

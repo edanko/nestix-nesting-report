@@ -1,0 +1,15 @@
+﻿<Window x:Class="Report.Forms.Launch"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Альбом КР" Height="121" Width="221" Icon="/Forms/1.ico" ResizeMode="NoResize" ShowInTaskbar="False" Topmost="True" WindowStartupLocation="CenterOwner" Padding="20,20,20,20" SizeToContent="WidthAndHeight">
+    <Grid Margin="5 0 20 20">
+        <Label Content="Альбом КР" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="LaunchTextBox" HorizontalAlignment="Left" Margin="10,41,0,0" Text="зап. вручную" TextWrapping="Wrap" VerticalAlignment="Top" Width="186"/>
+        <Button Content="ОК" HorizontalAlignment="Left" Margin="156,64,0,0" VerticalAlignment="Top" Width="40" Click="OK_Click" IsDefault="True"/>
+
+
+    </Grid>
+</Window>

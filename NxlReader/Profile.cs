@@ -1,0 +1,61 @@
+﻿using System.Collections.Generic;
+using System.Xml.Linq;
+
+namespace NxlReader
+{
+    public class Profile : IElement
+    {
+        public string MachiningMode { get; set; } 
+        public string ToolGroupName { get; set; } 
+        public List<IElement> Geometry { get; set; } = new List<IElement>();
+        public string Index { get; set; } 
+        public string Id { get; set; }
+        public Technology Tech { get; set; }
+
+        public void ReadPartInfo(XElement node)
+        {
+            if (node.Attribute("index") != null)
+            {
+                Index = node.Attribute("index")?.Value;
+            }
+
+            if (node.Attribute("id") != null)
+            {
+                Id = node.Attribute("id")?.Value;
+            }
+
+            MachiningMode = node.Element("MachiningMode")?.Value;
+            ToolGroupName = node.Element("ToolGroupName")?.Value;
+            
+            var t = new Technology();
+            t.Read(node.Element("Technology"));
+
+            Tech = t;
+        }
+
+        public void Read(XElement node)
+        {
+
+            if (node.Attribute("index") != null)
+            {
+                Index = node.Attribute("index")?.Value;
+            }
+
+            if (node.Attribute("id") != null)
+            {
+                Id = node.Attribute("id")?.Value;
+            }
+
+            MachiningMode = node.Element("MachiningMode")?.Value;
+            ToolGroupName = node.Element("ToolGroupName")?.Value;
+
+            //var g = new Geom();
+            Geometry = Geom.Read(node);
+
+        }
+
+        public Point Start { get; set; }
+        public Point End { get; set; }
+        public Point Center { get; set; }
+    }
+}
