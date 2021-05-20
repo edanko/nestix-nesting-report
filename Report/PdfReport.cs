@@ -478,22 +478,30 @@ namespace Report
 
                     string pos = "";
 
-                    if (!string.IsNullOrWhiteSpace(p.Section))
+                    // 16 - visible symbols count
+                    if (p.Section.Length + p.Pos.Length + 1 > 16)
                     {
-                        pos += p.Section;
+                        pos = p.Pos;
                     }
-
-                    if (!string.IsNullOrWhiteSpace(p.Pos))
+                    else
                     {
                         if (!string.IsNullOrWhiteSpace(p.Section))
                         {
-                            pos += "-";
+                            pos += p.Section;
                         }
 
-                        pos += p.Pos;
+                        if (!string.IsNullOrWhiteSpace(p.Pos))
+                        {
+                            if (!string.IsNullOrWhiteSpace(p.Section))
+                            {
+                                pos += "-";
+                            }
+
+                            pos += p.Pos;
+                        }
                     }
 
-                    partsTable.AddCell(TextCell(pos, fontSize: 8));
+                    partsTable.AddCell(TextCell(pos, fontSize: 7));
 
                     partsTable.AddCell(TextCell(p.DetailCount.ToString(), fontSize: 8));
                     partsTable.AddCell(TextCell($"{p.TotalWeight:F1}", fontSize: 8));
