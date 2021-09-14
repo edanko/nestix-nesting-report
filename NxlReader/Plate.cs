@@ -3,31 +3,37 @@ using System.Xml.Linq;
 
 namespace NxlReader
 {
-    public class Plate { 
+    public class Plate
+    {
+        public List<Profile> Profiles { get; set; } = new();
+        public List<TextProfile> Texts { get; set; } = new();
         
-        public string PlateWidth { get; set; }
-        public string PlateLength { get; set; }
-        public Point Origin { get; set; }
-        public List<Profile> Profiles { get; set; } = new List<Profile>();
-        
-        public Plate() {}
-
         public Plate(XElement n)
         {
             Read(n);
         }
-
-
         public void Read(XElement n)
         {
-            PlateLength = n.Element("PlateLength").Value;
-            PlateWidth = n.Element("PlateWidth").Value;
-            
-            foreach (var prof in n.Element("Profiles").Elements())
+            if (n.Element("Profiles") != null)
             {
-                var p = new Profile();
-                p.Read(prof);
-                Profiles.Add(p);
+                foreach (var prof in n.Element("Profiles")?.Elements()!)
+                {
+                    var p = new Profile();
+                    p.Read(prof);
+                    Profiles.Add(p);
+                }
+            }
+
+            if (n.Element("Texts") != null)
+            {
+                foreach (var node in n.Element("Texts")?.Elements()!)
+                {
+                    if (node.Name.LocalName == "TextProfile")
+                    {
+                        var textProfile = TextProfile.Read(node);
+                        Texts.Add(textProfile);
+                    }
+                }
             }
         }
     }

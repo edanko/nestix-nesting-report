@@ -5,11 +5,7 @@ namespace NxlReader
 {
     public class Bevel
     {
-        //public Parameters Parameters { get; set; } 
-
-        public List<Surface> Surfaces { get; set; } 
-
-        //public string Id { get; set; } 
+        public List<Surface> Surfaces { get; set; }
 
         public Bevel()
         {

@@ -7,14 +7,12 @@ namespace NxlReader
     {
         public string MachiningMode { get; set; }
         public string ToolGroupName { get; set; }
-        public List<IElement> Geometry { get; set; } = new List<IElement>();
+        public List<IElement> Geometry { get; set; } = new();
 
         public void Read(XElement n)
         {
-            MachiningMode = n.Element("MachiningMode").Value;
-            ToolGroupName = n.Element("ToolGroupName").Value;
-
-            //var g = new Geom();
+            MachiningMode = n.Element("MachiningMode")?.Value;
+            ToolGroupName = n.Element("ToolGroupName")?.Value;
             Geometry = Geom.Read(n);
         }
     }

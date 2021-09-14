@@ -2,8 +2,8 @@
 {
     public interface IElement
     {
-        public Point Start { get; set; } 
-        public Point End { get; set; }
-        public Point Center { get; set; }
+        Point Start { get; set; }
+        Point End { get; set; }
+        Point Center { get; set; }
     }
 }

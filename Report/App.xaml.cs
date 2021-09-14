@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Diagnostics;
@@ -11,37 +10,37 @@ using iText.Kernel.Font;
 using iText.Kernel.Pdf;
 using iText.Layout;
 using iText.Layout.Element;
-using Report.Forms;
 using TextAlignment = iText.Layout.Properties.TextAlignment;
 using VerticalAlignment = iText.Layout.Properties.VerticalAlignment;
 
 namespace Report
 {
-    public partial class App //: System.Windows.Application
+    public partial class App
     {
-
-
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-			if (!e.Args.Any())
+            if (!e.Args.Any())
             {
-                MessageBox.Show("no params", "error");
-				return;
-			}
+                MessageBox.Show("Запуск без параметров", "Ошибка");
+                return;
+            }
 
-            var pathIdsList = new List<List<string>>(); 
-            
+            var launchWindow = new Launch();
+            launchWindow.ShowDialog();
+
+            var pathIdsList = new List<List<string>>();
+
             foreach (var text in e.Args)
             {
                 if (!text.StartsWith("-PARAMS="))
                 {
                     continue;
                 }
-                
+
                 var paramsList = text.TrimStart("-PARAMS=".ToCharArray()).Split(',').ToList();
 
                 const int size = 1000;
-                    
+
                 for (int i = 0; i < paramsList.Count; i += size)
                 {
                     var end = i + size;
@@ -53,40 +52,49 @@ namespace Report
                     pathIdsList.Add(paramsList.GetRange(i, end - i));
                 }
             }
-            
+
             var db = GetDbName(@"..\..\master\settings\nestix2.ini");
-            
+
             if (string.IsNullOrWhiteSpace(db))
             {
-                MessageBox.Show("db name not found", "error");
+                MessageBox.Show("Имя базы данных не найдено в nestix2.ini", "Ошибка");
                 return;
             }
 
-            var connectionString = $"Data Source=BK-SSK-NESH01.CORP.LOCAL;Initial Catalog=NxSC_Zvezda_{db};Integrated Security=SSPI";
+            var connectionString =
+                $"Data Source=BK-SSK-NESH01.CORP.LOCAL;Initial Catalog={db};Integrated Security=SSPI";
 
             var mdList = new List<Nest>();
 
-            using var sqlConnection = new SqlConnection(connectionString);
+            var sqlConnection = new SqlConnection(connectionString);
             sqlConnection.Open();
             foreach (var pathIds in pathIdsList)
             {
                 mdList.AddRange(Db.FillMasterData(sqlConnection, pathIds));
             }
+
             sqlConnection.Close();
 
             if (mdList.Count == 0)
             {
-                MessageBox.Show("nc's not found", "error");
+                MessageBox.Show("Карты не найдены", "Ошибка");
                 return;
             }
-            
-            var all = new Dictionary<string, byte[]>();
 
-            var launchWindow = new Launch();
-            launchWindow.ShowDialog();
+            var all = new Dictionary<string, byte[]>();
 
             foreach (var m in mdList)
             {
+                if (m.PartsCount.HasValue && m.PartsCount.Value == 0)
+                {
+                    var res = MessageBox.Show($"Карта без деталей:\n{m.NcName}\nПропустить?", "Ошибка", MessageBoxButton.YesNo);
+                    if (res == MessageBoxResult.Yes)
+                    {
+                        continue;
+                    }
+
+                    return;
+                }
                 var rep = new PdfReport();
                 var bytes = rep.ProcessNest(m, launchWindow.LaunchString);
                 all[m.NcName] = bytes;
@@ -94,7 +102,7 @@ namespace Report
 
             if (all.Count == 0)
             {
-                MessageBox.Show("Document has no pages.");
+                MessageBox.Show("Документ пуст", "Ошибка");
                 return;
             }
 
@@ -102,13 +110,14 @@ namespace Report
             var sorted = all.OrderBy(x => x.Key);
 
             #region merge
-            using var mergedPdfStream = new MemoryStream();
+
+            var mergedPdfStream = new MemoryStream();
             var writer = new PdfWriter(mergedPdfStream);
             var pdf = new PdfDocument(writer);
 
-            foreach (var (_, bytes) in sorted)
+            foreach (var s in sorted)
             {
-                var src = new PdfDocument(new PdfReader(new MemoryStream(bytes)));
+                var src = new PdfDocument(new PdfReader(new MemoryStream(s.Value)));
 
                 src.CopyPagesTo(1, src.GetNumberOfPages(), pdf);
 
@@ -118,17 +127,20 @@ namespace Report
             pdf.Close();
 
             var mergedBytes = mergedPdfStream.ToArray();
+
             #endregion
 
             #region apply stamp
-            
+
             var ttf =
                 Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), "consola.ttf");
 
             var fontProgram = FontProgramFactory.CreateFont(ttf);
+#pragma warning disable 618
             var font = PdfFontFactory.CreateFont(fontProgram, PdfEncodings.IDENTITY_H, true);
-            
-            using var outPdfStream = new MemoryStream();
+#pragma warning restore 618
+
+            var outPdfStream = new MemoryStream();
 
             var pdfDoc = new PdfDocument(new PdfReader(new MemoryStream(mergedBytes)), new PdfWriter(outPdfStream));
 
@@ -184,48 +196,58 @@ namespace Report
 
             doc.Close();
             pdfDoc.Close();
+
             #endregion
 
             string file;
 
-            if (all.Keys.Count > 1)
+            if (string.IsNullOrWhiteSpace(launchWindow.LaunchString) || launchWindow.LaunchString == "зап. вручную")
             {
-                var spl = all.Keys.ToArray()[0].Split("-");
-
-                file = spl.Length == 4 ? $"{spl[1]}-{spl[2]}" : "merged";
+                file = $"{launchWindow.LaunchString}.pdf";
             }
             else
             {
-                file = all.Keys.ToArray()[0];
-            }
+                if (all.Keys.Count > 1)
+                {
+                    var spl = all.Keys.ToArray()[0].Split('-');
 
-            file += ".pdf";
+                    file = spl.Length == 4 ? $"{spl[1]}-{spl[2]}" : "merged";
+                }
+                else
+                {
+                    file = all.Keys.ToArray()[0];
+                }
+
+                file += ".pdf";
+            }
 
             var o = outPdfStream.ToArray();
 
             #region save result
+
             var folder = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            //var resultFilename = Path.Join(folder, file);
-            var resultFilename = Path.Join(folder, "Карты раскроя");
+            var resultFilename = Path.Combine(folder, "Карты раскроя");
 
             if (!Directory.Exists(resultFilename))
             {
                 Directory.CreateDirectory(resultFilename);
             }
-            
-            resultFilename = Path.Join(resultFilename, file);
 
+            resultFilename = Path.Combine(resultFilename, file);
 
 
             File.WriteAllBytes(resultFilename, o);
+
             #endregion
-            
+
             #region open pdf
+
             var psi = new ProcessStartInfo(resultFilename)
             {
                 UseShellExecute = true
             };
             Process.Start(psi);
+
             #endregion
         }
 
@@ -235,10 +257,9 @@ namespace Report
 
             if (!File.Exists(iniPath))
             {
-                //log.AddLine("ini file doesn't exists");
                 return db;
             }
-            
+
 
             var ini = File.ReadAllLines(iniPath);
             foreach (var l in ini)
@@ -247,19 +268,21 @@ namespace Report
                 {
                     continue;
                 }
+
                 var l2 = l.TrimStart("DataSource=".ToCharArray());
-                var lres = l2.Split(";");
+                var lres = l2.Split(';');
                 foreach (var s in lres)
                 {
                     if (!s.StartsWith("DATABASE"))
                     {
                         continue;
                     }
-                    db = s.Split("=")[1].TrimStart("NxSC_Zvezda_".ToCharArray());
+
+                    db = s.Split('=')[1];
                     return db;
                 }
             }
-            
+
             return db;
         }
     }

@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Windows;
 using iText.Barcodes;
 using iText.IO.Font;
 using iText.IO.Image;
@@ -18,6 +19,7 @@ using iText.Layout.Borders;
 using iText.Layout.Element;
 using iText.Layout.Properties;
 using HorizontalAlignment = iText.Layout.Properties.HorizontalAlignment;
+using Path = System.IO.Path;
 using TextAlignment = iText.Layout.Properties.TextAlignment;
 using VerticalAlignment = iText.Layout.Properties.VerticalAlignment;
 
@@ -30,15 +32,16 @@ namespace Report
         private const int DefaultCellHeight = 16;
 
         private static readonly string Consolas =
-            System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), "consola.ttf");
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), "consola.ttf");
 
         private FontProgram _fontProgram;
         private PdfFont _font;
 
-        private Cell TextCell(string text, bool bold = false, bool borders = true, int rowspan = 1, int colspan = 1, int fontSize = 10)
+        private Cell TextCell(string text, bool bold = false, bool borders = true, int rowspan = 1, int colspan = 1,
+            int fontSize = 10)
         {
             var c = new Cell(rowspan, colspan);
-            
+
             if (!borders)
             {
                 c.SetBorder(Border.NO_BORDER);
@@ -47,7 +50,7 @@ namespace Report
             var p = new Paragraph(text);
 
             p.SetTextAlignment(TextAlignment.CENTER);
-            
+
             p.SetFont(_font);
             p.SetFontSize(fontSize);
 
@@ -57,7 +60,7 @@ namespace Report
             {
                 p.SetBold();
             }
-            
+
             c.Add(p);
             return c;
         }
@@ -65,7 +68,8 @@ namespace Report
         public byte[] ProcessNest(Nest d, string launch)
         {
             _fontProgram = FontProgramFactory.CreateFont(Consolas);
-            _font = PdfFontFactory.CreateFont(_fontProgram, PdfEncodings.IDENTITY_H, PdfFontFactory.EmbeddingStrategy.PREFER_NOT_EMBEDDED);
+            _font = PdfFontFactory.CreateFont(_fontProgram, PdfEncodings.IDENTITY_H,
+                PdfFontFactory.EmbeddingStrategy.PREFER_NOT_EMBEDDED);
 
             var fs = new MemoryStream();
 
@@ -73,11 +77,11 @@ namespace Report
             var pdf = new PdfDocument(writer);
             var doc = new Document(pdf, PageSize.A3.Rotate());
             doc.SetMargins(15, 15, 14, 15);
-            
+
             const string masterPath = @"..\..\master";
 
             var nest = new NxlReader.Nest();
-            nest.Read(System.IO.Path.Join(masterPath, d.NxlFile));
+            nest.Read(Path.Combine(masterPath, d.NxlFile));
 
             #region header table
 
@@ -156,14 +160,16 @@ namespace Report
             table.AddCell(gasCell);
 
             table.AddCell(TextCell("", false, false));
-            
+
             #region barcode
 
-            var codeCell = new Cell(3,1);
+            var orderBarCode = launch.Split('.');
+
+            var codeCell = new Cell(3, 1);
             codeCell.SetBorder(Border.NO_BORDER);
 
             var code = new Barcode128(pdf, _font);
-            code.SetCode(d.NcName);
+            code.SetCode(orderBarCode.Length > 3 ? $"{orderBarCode[0]}|{d.NcName}" : d.NcName);
             code.SetSize(10);
 
             var barImage = new Image(code.CreateFormXObject(pdf));
@@ -172,7 +178,7 @@ namespace Report
             //barImage.SetMaxHeight(3 * DefaultCellHeight);
             barImage.ScaleToFit(250, 3 * DefaultCellHeight);
             //barImage.SetAutoScale(true);
-            
+
 
             codeCell.Add(barImage);
 
@@ -186,12 +192,19 @@ namespace Report
 
             var sections = d.Parts.Select(x => x.Section).Distinct().ToList();
 
-            string section = sections.Count switch
+            string section;
+            switch (sections.Count)
             {
-                2 => $"{sections[0]}, {sections[1]}",
-                1 => $"{sections[0]}",
-                _ => "Несколько"
-            };
+                case 2:
+                    section = $"{sections[0]}, {sections[1]}";
+                    break;
+                case 1:
+                    section = $"{sections[0]}";
+                    break;
+                default:
+                    section = "Несколько";
+                    break;
+            }
 
             table.AddCell(TextCell(order));
             table.AddCell(TextCell(section));
@@ -200,17 +213,17 @@ namespace Report
 
             var infoText = d.Info;
 
-            var spl = infoText.Split(";");
-            
+            var spl = infoText.Split(';');
+
             if (spl.Length == 2)
             {
                 infoText = spl[1].Trim();
             }
-            
+
             table.AddCell(TextCell(infoText));
 
             table.AddCell(TextCell("Марка", true));
-            table.AddCell(TextCell(d.Plate.Quality));
+            table.AddCell(TextCell(d.Plate.Quality.Replace("Grade ", "")));
 
             table.AddCell(TextCell("", borders: false));
 
@@ -228,44 +241,55 @@ namespace Report
 
             // fourth row
             table.AddCell(TextCell("МТР (Технология)", true));
-            
-            var tech = d.Machine switch
+
+            string tech;
+            switch (d.Machine)
             {
-                "PlasmaBevelOmniMatL8000" => "OM 8000 (Plasma)",
-                "GasBevelOmniMatL8000" => "OM 8000 (Gas)",
-                "LaserMat4200" => "LM 4200",
-                "GasOmniMatL7000" => "OM 7000 (Gas)",
-                _ => d.Machine
-            };
+                case "PlasmaBevelOmniMatL8000":
+                    tech = "OM8000 (Plasma)";
+                    break;
+                case "GasBevelOmniMatL8000":
+                    tech = "OM8000 (Gas)";
+                    break;
+                case "LaserMat4200":
+                    tech = "LM4200";
+                    break;
+                case "GasOmniMatL7000":
+                    tech = "OM7000 (Gas)";
+                    break;
+                default:
+                    tech = d.Machine;
+                    break;
+            }
 
             if (d.Machine == "PlasmaBevelOmniMatL8000" && nest.Machine != null)
             {
                 var t = nest.Machine.Technology.Split('-')[2];
 
-                tech = $"OM 8000 (Plasma {t})";
+                tech = $"OM8000 (Plasma {t})";
             }
 
             table.AddCell(TextCell(tech));
 
-            table.AddCell(TextCell("Масса мат. (дет.), кг", true));
-            table.AddCell(TextCell($"{d.Plate.NestGrossWeight:F1} ({d.PartsWeight:F1})"));
+            table.AddCell(TextCell("Масса мат. / дет. кг", true));
+            table.AddCell(
+                TextCell($"{(d.MatWeight == 0.0 ? d.Plate.NestGrossWeight : d.MatWeight):F1} / {d.PartsWeight:F1}"));
 
-            table.AddCell(TextCell("-"));
-            table.AddCell(TextCell("-"));
+            table.AddCell(TextCell("Масса ДМО, кг", true));
+            table.AddCell(TextCell($"{d.RemnantWeight:F1}"));
 
 
             table.AddCell(TextCell("", borders: false));
-            
-            
+
 
             var launchCell = new Cell(1, 1);
-         
+
             launchCell.SetBorder(Border.NO_BORDER);
 
             var lp = new Paragraph($"Альбом КР: {launch}");
 
             lp.SetTextAlignment(TextAlignment.RIGHT);
-            
+
             lp.SetFont(_font);
             lp.SetFontSize(10);
 
@@ -276,18 +300,20 @@ namespace Report
             launchCell.Add(lp);
 
             table.AddCell(launchCell);
-            
+
             doc.Add(table);
 
             #endregion
 
             #region main content
-            table = new Table(UnitValue.CreatePercentArray(new[] {21f, 79f}));
+
+            table = new Table(UnitValue.CreatePercentArray(new[] { 21f, 79f }));
             table.SetWidth(UnitValue.CreatePercentValue(100));
             //table.SetFixedLayout();
             table.SetHorizontalAlignment(HorizontalAlignment.LEFT);
-            
+
             #region tools
+
             if (d.Tools.Sum(x => x.TotalTimeMin) == 0)
             {
                 var toolsCell = new Cell();
@@ -298,14 +324,14 @@ namespace Report
             }
             else
             {
-                var toolsTable = new Table(UnitValue.CreatePercentArray(new[] {3f, 2f, 2f}));
+                var toolsTable = new Table(UnitValue.CreatePercentArray(new[] { 3f, 2f, 2f }));
                 toolsTable.SetWidth(UnitValue.CreatePercentValue(100));
                 //toolsTable.SetFixedLayout();
 
                 toolsTable.SetMargin(0);
 
                 toolsTable.SetHorizontalAlignment(HorizontalAlignment.LEFT);
-                
+
                 toolsTable.AddCell(TextCell("Инструменты", true, colspan: 3));
 
                 toolsTable.AddCell(TextCell("Тип", true));
@@ -322,7 +348,7 @@ namespace Report
 
                     _firstPagePartsCount--;
                 }
-                
+
                 if (nest.RidgesCount > 0)
                 {
                     toolsTable.AddCell(TextCell("Перемычки"));
@@ -353,25 +379,27 @@ namespace Report
 
                 if (markingText.Count > 0)
                 {
-                    toolsTable.AddCell(TextCell("Черн. маркировка"));
+                    toolsTable.AddCell(TextCell("Маркировка"));
                     toolsTable.AddCell(TextCell($"{nest.TextSymbolsCount} симв"));
 
                     toolsTable.AddCell(TextCell($"{markingText.Sum(x => x.TotalTimeMin):F1} мин"));
-                    
+
                     _firstPagePartsCount--;
                 }
 
-                var markingLine = (from t in d.Tools where t.ToolName.StartsWith("Marking line") || t.ToolName.StartsWith("Линейная") select t).ToList();
+                var markingLine =
+                    (from t in d.Tools
+                        where t.ToolName.StartsWith("Marking line") || t.ToolName.StartsWith("Линейная")
+                        select t).ToList();
 
                 if (markingLine.Count > 0)
                 {
-                    toolsTable.AddCell(TextCell("Плазм. разметка"));
+                    toolsTable.AddCell(TextCell("Разметка"));
                     toolsTable.AddCell(TextCell($"{markingLine.Sum(x => x.DistanceM):F1} м"));
                     toolsTable.AddCell(TextCell($"{markingLine.Sum(x => x.TotalTimeMin):F1} мин"));
 
                     _firstPagePartsCount--;
                 }
-                
 
                 if (cut.Count > 0)
                 {
@@ -407,22 +435,24 @@ namespace Report
                 toolsCell.Add(toolsTable);
 
                 table.AddCell(toolsCell);
-
             }
 
             #endregion
 
             #region image
-            var imgPath = System.IO.Path.Join(masterPath, d.EmfImage);
+
             var imgCell = new Cell(2, 1);
             imgCell.SetMargin(5);
             imgCell.SetBorder(Border.NO_BORDER);
             imgCell.SetHorizontalAlignment(HorizontalAlignment.CENTER);
             imgCell.SetVerticalAlignment(VerticalAlignment.MIDDLE);
-            
+
+
+#if USE_EMF
+            var imgPath = Path.Combine(masterPath, d.EmfImage);
             var mf = new Metafile(imgPath);
             Image img1;
-            
+
             var wmfBytes = GetMetafileRawData(mf);
             if (wmfBytes.Length != 22)
             {
@@ -431,26 +461,38 @@ namespace Report
             }
             else
             {
-                mf = new Metafile(imgPath);
+                try
+                {
+                    mf = new Metafile(imgPath);
 
-                using var thumb = mf.GetThumbnailImage(mf.Width / 5, mf.Height / 5, null, IntPtr.Zero);
-                using var imageStream = new MemoryStream();
-                thumb.Save(imageStream, ImageFormat.Png);
-                imageStream.Position = 0;
+                    var thumb = mf.GetThumbnailImage(mf.Width / 5, mf.Height / 5, null, IntPtr.Zero);
+                    var imageStream = new MemoryStream();
+                    thumb.Save(imageStream, ImageFormat.Png);
+                    imageStream.Position = 0;
 
-                img1 = new Image(ImageDataFactory.Create(imageStream.ToArray()));
+                    img1 = new Image(ImageDataFactory.Create(imageStream.ToArray()));
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show(e.Message, d.NcName);
+                    return null;
+                }
             }
-            
+
             //var img1 = new Image(img);
 
             img1.SetBorder(Border.NO_BORDER);
             img1.ScaleToFit(900, 610);
             imgCell.Add(img1);
+#endif
+
             table.AddCell(imgCell);
+
             #endregion
 
             #region part list
-            var partsTable = new Table(UnitValue.CreatePercentArray(new[] {0.6f, 2.5f, 0.6f, 1, 2.2f}));
+
+            var partsTable = new Table(UnitValue.CreatePercentArray(new[] { 0.6f, 2.5f, 0.6f, 1, 2.2f }));
             partsTable.SetWidth(UnitValue.CreatePercentValue(100));
             partsTable.SetHorizontalAlignment(HorizontalAlignment.LEFT);
 
@@ -459,7 +501,7 @@ namespace Report
             partsTable.AddCell(TextCell("#", true, fontSize: 8));
             partsTable.AddCell(TextCell("Наименование", true, fontSize: 8));
             partsTable.AddCell(TextCell("Q", true, fontSize: 8));
-            partsTable.AddCell(TextCell("Σm, кг", true, fontSize: 8));
+            partsTable.AddCell(TextCell("m, кг", true, fontSize: 8));
             partsTable.AddCell(TextCell("LxW, мм", true, fontSize: 8));
 
             for (var i = 0; i < _firstPagePartsCount; i++)
@@ -468,7 +510,7 @@ namespace Report
                 {
                     var p = d.Parts[i];
 
-                    var detid = p.DetailCode.ToString();
+                    var detid = p.DetailCode;
                     if (detid == "0")
                     {
                         detid = "x";
@@ -504,7 +546,7 @@ namespace Report
                     partsTable.AddCell(TextCell(pos, fontSize: 7));
 
                     partsTable.AddCell(TextCell(p.DetailCount.ToString(), fontSize: 8));
-                    partsTable.AddCell(TextCell($"{p.TotalWeight:F1}", fontSize: 8));
+                    partsTable.AddCell(TextCell($"{p.Weight:F1}", fontSize: 8));
                     partsTable.AddCell(TextCell($"{p.Length:F1} x {p.Width:F1}", fontSize: 8));
                 }
                 else
@@ -527,9 +569,22 @@ namespace Report
             #endregion
 
             doc.Add(table);
+
+#if !USE_EMF
+            var page = pdf.GetPage(1);
+            var canvas = new PdfCanvas(page);
+
+            var rect = new Rectangle(280, 50, 870, 650);
+            canvas.Rectangle(rect);
+            canvas.Stroke();
+
+            NxlReader.Drawer.Pdf.Draw(canvas, rect, nest);
+#endif
+
             #endregion
 
             #region parts page
+
             if (d.PartsCount > _firstPagePartsCount)
             {
                 var remainParts = d.Parts.Skip(_firstPagePartsCount).ToList();
@@ -539,16 +594,16 @@ namespace Report
                     pdf.AddNewPage();
                     var columnsPopulated = 0;
 
-                    table = new Table(UnitValue.CreatePercentArray(new[] {1f, 1f, 1f, 1f}));
+                    table = new Table(UnitValue.CreatePercentArray(new[] { 1f, 1f, 1f, 1f }));
                     table.SetWidth(UnitValue.CreatePercentValue(100));
                     table.SetFixedLayout();
 
                     for (int i = 0; i < 4; i++)
                     {
-                        var p2 = new Table(UnitValue.CreatePercentArray(new[] {0.6f, 2.5f, 0.6f, 1, 2.2f}));
+                        var p2 = new Table(UnitValue.CreatePercentArray(new[] { 0.6f, 2.5f, 0.6f, 1, 2.2f }));
 
                         p2.SetWidth(UnitValue.CreatePercentValue(100));
-                        
+
                         p2.SetHorizontalAlignment(HorizontalAlignment.LEFT);
 
                         int counter = 0;
@@ -560,7 +615,7 @@ namespace Report
                             p2.AddCell(TextCell("#", true, fontSize: 8));
                             p2.AddCell(TextCell("Наименование", true, fontSize: 8));
                             p2.AddCell(TextCell("Q", true, fontSize: 8));
-                            p2.AddCell(TextCell("Ʃm, кг", true, fontSize: 8));
+                            p2.AddCell(TextCell("m, кг", true, fontSize: 8));
                             p2.AddCell(TextCell("LxW, мм", true, fontSize: 8));
 
                             counter += 2;
@@ -572,10 +627,10 @@ namespace Report
 
                             if (remainRowsCount > 0)
                             {
-                                if (p == remainParts[^1])
+                                if (p == remainParts[remainParts.Count - 1])
                                 {
                                     // last part
-                                    var detid = p.DetailCode.ToString();
+                                    var detid = p.DetailCode;
                                     if (detid == "0")
                                     {
                                         detid = "x";
@@ -604,10 +659,10 @@ namespace Report
 
 
                                     p2.AddCell(TextCell(p.DetailCount.ToString(), fontSize: 8));
-                                    p2.AddCell(TextCell($"{p.TotalWeight:F1}", fontSize: 8));
+                                    p2.AddCell(TextCell($"{p.Weight:F1}", fontSize: 8));
                                     p2.AddCell(TextCell($"{p.Length:F1} x {p.Width:F1}", fontSize: 8));
 
-                                    for (int j = 0; j < remainRowsCount-1; j++)
+                                    for (int j = 0; j < remainRowsCount - 1; j++)
                                     {
                                         p2.AddCell(TextCell(""));
                                         p2.AddCell(TextCell(""));
@@ -618,7 +673,7 @@ namespace Report
                                 }
                                 else
                                 {
-                                    var detid = p.DetailCode.ToString();
+                                    var detid = p.DetailCode;
                                     if (detid == "0")
                                     {
                                         detid = "x";
@@ -646,7 +701,7 @@ namespace Report
                                     p2.AddCell(TextCell(pos, fontSize: 8));
 
                                     p2.AddCell(TextCell(p.DetailCount.ToString(), fontSize: 8));
-                                    p2.AddCell(TextCell($"{p.TotalWeight:F1}", fontSize: 8));
+                                    p2.AddCell(TextCell($"{p.Weight:F1}", fontSize: 8));
                                     p2.AddCell(TextCell($"{p.Length:F1} x {p.Width:F1}", fontSize: 8));
                                 }
 
@@ -704,9 +759,12 @@ namespace Report
 
             return fs.ToArray();
         }
-        
+
+#if USE_EMF
         [DllImport("gdiplus.dll", SetLastError = true)]
-        private static extern int GdipEmfToWmfBits(IntPtr hEmf, int uBufferSize, byte[] bBuffer, int iMappingMode, EmfToWmfBitsFlags flags);
+        private static extern int GdipEmfToWmfBits(IntPtr hEmf, int uBufferSize, byte[] bBuffer, int iMappingMode,
+            EmfToWmfBitsFlags flags);
+
 /*
         [DllImport("gdi32.dll")]
         private static extern IntPtr SetEnhMetaFileBits(uint cbBuffer, byte[] lpBuffer);
@@ -718,6 +776,7 @@ namespace Report
         private enum EmfToWmfBitsFlags
         {
             EmfToWmfBitsFlagsDefault = 0x00000000,
+
             //EmfToWmfBitsFlagsEmbedEmf = 0x00000001,
             EmfToWmfBitsFlagsIncludePlaceable = 0x00000002,
             //EmfToWmfBitsFlagsNoXORClip = 0x00000004
@@ -731,7 +790,7 @@ namespace Report
         //     GdipEmfToWmfBits(handle, bufferSize, buf, MM_ANISOTROPIC, EmfToWmfBitsFlags.EmfToWmfBitsFlagsIncludePlaceable);
         //     return buf;
         // }
-        
+
         [StructLayout(LayoutKind.Sequential)]
         private struct Placeablemetaheader
         {
@@ -745,7 +804,7 @@ namespace Report
             public uint Reserved; // Reserved (always 0) /
             public ushort Checksum; // Checksum value for previous 10 WORDs */
         }
-        
+
         private static byte[] GetMetafileRawData(Metafile metafile)
         {
             byte[] data;
@@ -780,24 +839,24 @@ namespace Report
                     var placeable = new Placeablemetaheader
                     {
                         Key = 0x9AC6CDD7,
-                        Left = (short) header.Bounds.Left,
-                        Top = (short) header.Bounds.Top,
-                        Right = (short) header.Bounds.Width,
-                        Bottom = (short) header.Bounds.Height,
+                        Left = (short)header.Bounds.Left,
+                        Top = (short)header.Bounds.Top,
+                        Right = (short)header.Bounds.Width,
+                        Bottom = (short)header.Bounds.Height,
                         Inch = 1440,
                         Checksum = 0
                     };
 
-                    placeable.Checksum ^= (ushort) (placeable.Key & 0x0000FFFF);
-                    placeable.Checksum ^= (ushort) ((placeable.Key & 0xFFFF0000) >> 16);
+                    placeable.Checksum ^= (ushort)(placeable.Key & 0x0000FFFF);
+                    placeable.Checksum ^= (ushort)((placeable.Key & 0xFFFF0000) >> 16);
                     placeable.Checksum ^= placeable.Handle;
-                    placeable.Checksum ^= (ushort) placeable.Left;
-                    placeable.Checksum ^= (ushort) placeable.Top;
-                    placeable.Checksum ^= (ushort) placeable.Right;
-                    placeable.Checksum ^= (ushort) placeable.Bottom;
+                    placeable.Checksum ^= (ushort)placeable.Left;
+                    placeable.Checksum ^= (ushort)placeable.Top;
+                    placeable.Checksum ^= (ushort)placeable.Right;
+                    placeable.Checksum ^= (ushort)placeable.Bottom;
                     placeable.Checksum ^= placeable.Inch;
-                    placeable.Checksum ^= (ushort) (placeable.Reserved & 0x0000FFFF);
-                    placeable.Checksum ^= (ushort) ((placeable.Reserved & 0xFFFF0000) >> 16);
+                    placeable.Checksum ^= (ushort)(placeable.Reserved & 0x0000FFFF);
+                    placeable.Checksum ^= (ushort)((placeable.Reserved & 0xFFFF0000) >> 16);
 
                     placeableList.AddRange(SerializeSequentialStruct(placeable));
                     placeableList.AddRange(data);
@@ -822,8 +881,9 @@ namespace Report
             Marshal.Copy(ptr, arr, 0, size);
 
             Marshal.FreeHGlobal(ptr);
-            
+
             return arr;
         }
+#endif
     }
 }

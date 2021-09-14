@@ -1,27 +1,54 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<AssemblyName>report</AssemblyName>
-		<GenerateAssemblyInfo>True</GenerateAssemblyInfo>
-		<Platforms>x64</Platforms>
-		<LangVersion>latest</LangVersion>
 		<ApplicationIcon>1.ico</ApplicationIcon>
-		<UseWPF>true</UseWPF>
+		<Platforms>AnyCPU;x64</Platforms>
 		<OutputType>WinExe</OutputType>
-		<StartupObject>Report.App</StartupObject>
-		<TargetFramework>net5.0-windows</TargetFramework>
-		<IsPackable>false</IsPackable>
+		<TargetFramework>net472</TargetFramework>
+		<SignAssembly>false</SignAssembly>
 	</PropertyGroup>
-
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+	  <DefineConstants>$(DefineConstants)TRACE;USE_EMF</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+	  <DefineConstants>$(DefineConstants)TRACE;USE_EMF</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+	  <DefineConstants>$(DefineConstants)TRACE;USE_EMF</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+	  <DefineConstants>$(DefineConstants)TRACE;USE_EMF</DefineConstants>
+	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="itext7" Version="7.1.15" />
-		<PackageReference Include="System.Configuration.ConfigurationManager" Version="5.0.0" />
-		<PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
-		<PackageReference Include="System.Resources.Extensions" Version="5.0.0" />
+		<ApplicationDefinition Include="App.xaml" />
 	</ItemGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\NxlReader\NxlReader.csproj" />
+		<PackageReference Include="itext7" Version="7.1.16" />
 	</ItemGroup>
 	<ItemGroup>
-	  <Resource Include="Forms\1.ico" />
+		<ProjectReference Include="..\NxlReader\NxlReader.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<Reference Include="System" />
+		<Reference Include="System.Core" />
+		<Reference Include="System.Data" />
+		<Reference Include="System.Xml" />
+		<Reference Include="System.Xaml">
+			<RequiredTargetFramework>4.0</RequiredTargetFramework>
+		</Reference>
+		<Reference Include="WindowsBase" />
+		<Reference Include="PresentationCore" />
+		<Reference Include="PresentationFramework" />
+	</ItemGroup>
+	<ItemGroup>
+		<None Include="App.config" />
+	</ItemGroup>
+	<ItemGroup>
+		<Page Include="Launch.xaml" />
+	</ItemGroup>
+	<ItemGroup>
+	  <None Update="1.ico">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
 	</ItemGroup>
 </Project>

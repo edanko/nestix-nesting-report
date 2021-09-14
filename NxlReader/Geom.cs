@@ -6,7 +6,7 @@ using System.Xml.Linq;
 
 namespace NxlReader
 {
-    public class Geom
+    public static class Geom
     {
         public static List<IElement> Read(XElement node)
         {
@@ -14,24 +14,22 @@ namespace NxlReader
 
             var start = new Point();
 
-            foreach (var g in node.Element("Geometry").Elements())
+            foreach (var g in node.Element("Geometry")?.Elements()!)
             {
                 switch (g.Name.LocalName)
                 {
                     case "Start":
-
-                        start.X = float.Parse(g.Element("X")?.Value, CultureInfo.InvariantCulture);
-                        start.Y = float.Parse(g.Element("Y")?.Value, CultureInfo.InvariantCulture);
-
+                        start.X = float.Parse(g.Element("X")?.Value!, CultureInfo.InvariantCulture);
+                        start.Y = float.Parse(g.Element("Y")?.Value!, CultureInfo.InvariantCulture);
                         break;
-                    case "LineTo":
 
+                    case "LineTo":
                         var l = new Line
                         {
                             End = new Point
                             {
-                                X = float.Parse(g.Element("X")?.Value, CultureInfo.InvariantCulture),
-                                Y = float.Parse(g.Element("Y")?.Value, CultureInfo.InvariantCulture)
+                                X = float.Parse(g.Element("X")?.Value!, CultureInfo.InvariantCulture),
+                                Y = float.Parse(g.Element("Y")?.Value!, CultureInfo.InvariantCulture)
                             }
                         };
 
@@ -60,13 +58,13 @@ namespace NxlReader
                         {
                             End = new Point
                             {
-                                X = float.Parse(g.Element("X")?.Value, CultureInfo.InvariantCulture),
-                                Y = float.Parse(g.Element("Y")?.Value, CultureInfo.InvariantCulture)
+                                X = float.Parse(g.Element("X")?.Value!, CultureInfo.InvariantCulture),
+                                Y = float.Parse(g.Element("Y")?.Value!, CultureInfo.InvariantCulture)
                             },
                             Center = new Point
                             {
-                                X = float.Parse(g.Element("CX")?.Value, CultureInfo.InvariantCulture),
-                                Y = float.Parse(g.Element("CY")?.Value, CultureInfo.InvariantCulture)
+                                X = float.Parse(g.Element("CX")?.Value!, CultureInfo.InvariantCulture),
+                                Y = float.Parse(g.Element("CY")?.Value!, CultureInfo.InvariantCulture)
                             },
 
                             Direction = g.Element("D")?.Value

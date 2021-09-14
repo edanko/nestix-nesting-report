@@ -4,16 +4,15 @@ namespace NxlReader
 {
     public class Part
     {
-        public List<IElement> Elements { get; set; }= new List<IElement>();
-        public Matrix33 Matrix { get; set; } = new Matrix33();
-        public string Annotations { get; set; } 
-        public List<TextProfile> Texts { get; set; }  = new List<TextProfile>();
-        public TextProfile DetailId { get; set; } = new TextProfile();
-
-        public List<IElement> OrigElements { get; set; }= new List<IElement>();
-        public List<TextProfile> OrigTexts { get; set; }  = new List<TextProfile>();
-
-
+        public List<Profile> Profiles { get; set; } = new();
+        public Matrix33 Matrix { get; set; } = new();
+        public List<TextProfile> Texts { get; set; } = new();
+        public TextProfile DetailId { get; set; } = new();
         public string OrderlineInfo { get; set; }
+
+        public Part DeepCopy()
+        {
+            return FastClone.Cloner.Clone(this);
+        }
     }
 }

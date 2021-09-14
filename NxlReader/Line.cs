@@ -5,13 +5,11 @@ namespace NxlReader
 {
     public class Line : IElement
     {
-        public Point Start { get; set; } 
+        public Point Start { get; set; }
         public Point End { get; set; }
         public Point Center { get; set; }
-        public string MachiningMode { get; set; } 
-        public string ToolGroupName { get; set; } 
-        public string PartToolLayerType { get; set; }
-
+        public string MachiningMode { get; set; }
+        public string ToolGroupName { get; set; }
 
         public static Line Read(XElement node)
         {
@@ -19,18 +17,16 @@ namespace NxlReader
             {
                 Start = new Point
                 {
-                    X = float.Parse(node.Element("StartPoint").Attribute("X").Value, CultureInfo.InvariantCulture),
-                    Y = float.Parse(node.Element("StartPoint").Attribute("Y").Value, CultureInfo.InvariantCulture)
-
+                    X = float.Parse(node.Element("StartPoint")?.Attribute("X")?.Value!, CultureInfo.InvariantCulture),
+                    Y = float.Parse(node.Element("StartPoint")?.Attribute("Y")?.Value!, CultureInfo.InvariantCulture)
                 },
                 End = new Point
                 {
-                    X = float.Parse(node.Element("EndPoint").Attribute("X").Value, CultureInfo.InvariantCulture),
-                    Y = float.Parse(node.Element("EndPoint").Attribute("Y").Value, CultureInfo.InvariantCulture)
-
+                    X = float.Parse(node.Element("EndPoint")?.Attribute("X")?.Value!, CultureInfo.InvariantCulture),
+                    Y = float.Parse(node.Element("EndPoint")?.Attribute("Y")?.Value!, CultureInfo.InvariantCulture)
                 },
-                MachiningMode = node.Element("MachiningMode").Value,
-                ToolGroupName = node.Element("ToolGroupName").Value
+                MachiningMode = node.Element("MachiningMode")?.Value,
+                ToolGroupName = node.Element("ToolGroupName")?.Value
             };
 
             return line;

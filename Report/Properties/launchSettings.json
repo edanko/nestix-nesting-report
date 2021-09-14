@@ -6,21 +6,13 @@
     "Run Working Machine": {
       "commandName": "Executable",
       "executablePath": "\\\\bk-ssk-nestix01\\NxSC_Zvezda_Leader\\bin\\report\\report.exe",
-      "commandLineArgs": "-PARAMS=20650,20649,20648,20695,20693,20692,20691,20690,20688,20687,20686,20685,20684,20683,20680,20679,20678,20677,20676,20675,20672,20671,20667,20666,20665,20664,20663,20662,20661,20660,20659,20658,20657,20656,20655,20654,20653,20652,20651,20708,20719,20707,20701,20700,20699,20697,20696,20694,20689,20682,20681,20674,20673,20670,20669,20714,20705,20704,20703,20709,20702,20698 -NXLANG=Eng",
+      "commandLineArgs": "-PARAMS=21666,21667,21668,21669,21670,21671,21722,21673,21674,21675,21761,21762,21763,21764,21765,21766,21767,21768,21685,21686,21687,21688,21689,21690,21691,21693,21694,21695,21696,21697,21698,21699,21700,21702,21703,21704,21727,21728,21729,21730,21731,21733,21732,21734,21735,21736,21737,21738,21739,21740,21741,21742,21770,21743,21744,21745,21746,21747,21748,21769",
       "workingDirectory": "\\\\bk-ssk-nestix01\\NxSC_Zvezda_Leader\\bin\\report\\",
       "remoteDebugEnabled": true,
+      "sqlDebugging": true,
       "remoteDebugMachine": "C33010704",
       "authenticationMode": "Windows",
       "nativeDebugging": true
-    },
-    "Run remote without cut": {
-      "commandName": "Executable",
-      "executablePath": "\\\\bk-ssk-nestix01\\NxSC_Zvezda_AFRA\\bin\\report\\report.exe",
-      "commandLineArgs": "-PARAMS=21104,21123,21128,21096,21088,21089,21101,21110,21120,21121,21127,21092,21094,21097,21099,21115,21116,21118,21119,21112,21114,21117,21122,21090,21091,21093,21095,21098,21100,21102,21103,21105,21106,21108,21113,21126,21132,21109,21111,21143,21107,21125 -NXLANG=Eng",
-      "workingDirectory": "\\\\bk-ssk-nestix01\\NxSC_Zvezda_AFRA\\bin\\report\\",
-      "remoteDebugEnabled": true,
-      "remoteDebugMachine": "C33010704",
-      "authenticationMode": "Windows"
     }
   }
 }
