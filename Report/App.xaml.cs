@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Diagnostics;
@@ -25,9 +26,6 @@ namespace Report
                 return;
             }
 
-            var launchWindow = new Launch();
-            launchWindow.ShowDialog();
-
             var pathIdsList = new List<List<string>>();
 
             foreach (var text in e.Args)
@@ -53,17 +51,32 @@ namespace Report
                 }
             }
 
-            var db = GetDbName(@"..\..\master\settings\nestix2.ini");
+            var dirs = Directory.GetDirectories(@"..\..\");
+            string dir = "";
 
-            if (string.IsNullOrWhiteSpace(db))
+            foreach (var s in dirs)
+            {
+                if (s.EndsWith("master") || s.EndsWith(".mas"))
+                {
+                    dir = s;
+                    break;
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(dir))
+            {
+                MessageBox.Show("Директория master не найдена", "Ошибка");
+                return;
+            }
+            
+            var connectionString = GetDataSource($@"{dir}\settings\nestix2.ini");
+
+            if (string.IsNullOrWhiteSpace(connectionString))
             {
                 MessageBox.Show("Имя базы данных не найдено в nestix2.ini", "Ошибка");
                 return;
             }
-
-            var connectionString =
-                $"Data Source=BK-SSK-NESH01.CORP.LOCAL;Initial Catalog={db};Integrated Security=SSPI";
-
+            
             var mdList = new List<Nest>();
 
             var sqlConnection = new SqlConnection(connectionString);
@@ -81,38 +94,36 @@ namespace Report
                 return;
             }
 
-            var all = new Dictionary<string, byte[]>();
-
-            foreach (var m in mdList)
+            var launchWindow = new Launch();
+            if (mdList.Count > 1)
             {
-                if (m.PartsCount.HasValue && m.PartsCount.Value == 0)
+                launchWindow.ShowDialog();
+            }
+
+            var stp = new SmartThreadPool.SmartThreadPool();
+
+            var all = new ConcurrentDictionary<string, byte[]>();
+
+            foreach (var m in mdList.Where(m => m.Parts.Count != 0))
+            {
+                stp.QueueWorkItem(() =>
                 {
-                    var res = MessageBox.Show($"Карта без деталей:\n{m.NcName}\nПропустить?", "Ошибка", MessageBoxButton.YesNo);
-                    if (res == MessageBoxResult.Yes)
-                    {
-                        continue;
-                    }
-
-                    return;
-                }
-                var rep = new PdfReport();
-                var bytes = rep.ProcessNest(m, launchWindow.LaunchString);
-                all[m.NcName] = bytes;
+                    var rep = new PdfReport();
+                    var bytes = rep.ProcessNest(m, launchWindow.LaunchString);
+                    all.TryAdd(m.NcName, bytes);
+                });
             }
 
-            if (all.Count == 0)
-            {
-                MessageBox.Show("Документ пуст", "Ошибка");
-                return;
-            }
+            stp.WaitForIdle();
+            stp.Shutdown();
 
-            // sort by nc name asc
             var sorted = all.OrderBy(x => x.Key);
 
             #region merge
 
             var mergedPdfStream = new MemoryStream();
             var writer = new PdfWriter(mergedPdfStream);
+            writer.SetCompressionLevel(9);
             var pdf = new PdfDocument(writer);
 
             foreach (var s in sorted)
@@ -198,10 +209,10 @@ namespace Report
             pdfDoc.Close();
 
             #endregion
-
+            
             string file;
 
-            if (string.IsNullOrWhiteSpace(launchWindow.LaunchString) || launchWindow.LaunchString == "зап. вручную")
+            if (string.IsNullOrWhiteSpace(launchWindow.LaunchString) || launchWindow.LaunchString != "зап. вручную")
             {
                 file = $"{launchWindow.LaunchString}.pdf";
             }
@@ -251,7 +262,7 @@ namespace Report
             #endregion
         }
 
-        private static string GetDbName(string iniPath)
+        private static string GetDataSource(string iniPath)
         {
             var db = "";
 
@@ -259,7 +270,6 @@ namespace Report
             {
                 return db;
             }
-
 
             var ini = File.ReadAllLines(iniPath);
             foreach (var l in ini)
@@ -269,18 +279,7 @@ namespace Report
                     continue;
                 }
 
-                var l2 = l.TrimStart("DataSource=".ToCharArray());
-                var lres = l2.Split(';');
-                foreach (var s in lres)
-                {
-                    if (!s.StartsWith("DATABASE"))
-                    {
-                        continue;
-                    }
-
-                    db = s.Split('=')[1];
-                    return db;
-                }
+                return l.Split(new[] {';'}, 2)[1];
             }
 
             return db;
