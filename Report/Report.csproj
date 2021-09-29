@@ -8,16 +8,16 @@
 		<SignAssembly>false</SignAssembly>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-	  <DefineConstants>$(DefineConstants)TRACE;USE_EMF</DefineConstants>
+	  <DefineConstants>$(DefineConstants)TRACE;NOT_USE_EMF</DefineConstants>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-	  <DefineConstants>$(DefineConstants)TRACE;USE_EMF</DefineConstants>
+	  <DefineConstants>$(DefineConstants)TRACE;NOT_USE_EMF</DefineConstants>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-	  <DefineConstants>$(DefineConstants)TRACE;USE_EMF</DefineConstants>
+	  <DefineConstants>$(DefineConstants)TRACE;NOT_USE_EMF</DefineConstants>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-	  <DefineConstants>$(DefineConstants)TRACE;USE_EMF</DefineConstants>
+	  <DefineConstants>$(DefineConstants)TRACE;NOT_USE_EMF</DefineConstants>
 	</PropertyGroup>
 	<ItemGroup>
 		<ApplicationDefinition Include="App.xaml" />
@@ -32,6 +32,7 @@
 		<Reference Include="System" />
 		<Reference Include="System.Core" />
 		<Reference Include="System.Data" />
+		<Reference Include="System.Web" />
 		<Reference Include="System.Xml" />
 		<Reference Include="System.Xaml">
 			<RequiredTargetFramework>4.0</RequiredTargetFramework>
@@ -42,6 +43,7 @@
 	</ItemGroup>
 	<ItemGroup>
 		<None Include="App.config" />
+		<None Include="SmartThreadPool\SmartThreadPool.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 		<Page Include="Launch.xaml" />

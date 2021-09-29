@@ -11,7 +11,6 @@ namespace NxlReader
     public class Nest
     {
         public Machine Machine { get; set; }
-
         public Plate Plate { get; set; }
         public List<Remnant> OriginalRemnants { get; set; } = new();
         public List<Part> Parts { get; set; } = new();
@@ -320,9 +319,8 @@ namespace NxlReader
 
         public Rectangle GetBBox()
         {
-            double maxHeight = 0, maxWidth = 0, minHeight = 0, minWidth = 0;
+            double maxHeight = double.MinValue, maxWidth = double.MinValue, minHeight = double.MaxValue, minWidth = double.MaxValue;
 
-            var r = new Rectangle();
 
             foreach (var g in Plate.Profiles.SelectMany(p => p.Geometry))
             {
@@ -367,15 +365,50 @@ namespace NxlReader
                 }
             }
 
-            // foreach (var rem in OriginalRemnants)
-            // {
-            //     foreach (var g in rem.Profiles)
-            //     {
-            //         
-            //     }
-            // }
-
             foreach (var g in Remnants.SelectMany(remnant => remnant.Profiles.SelectMany(p => p.Geometry)))
+            {
+                if (g.Start.X > maxWidth)
+                {
+                    maxWidth = g.Start.X;
+                }
+
+                if (g.Start.X < minWidth)
+                {
+                    minWidth = g.Start.X;
+                }
+
+                if (g.Start.Y > maxHeight)
+                {
+                    maxHeight = g.Start.Y;
+                }
+
+                if (g.Start.Y < minHeight)
+                {
+                    minHeight = g.Start.Y;
+                }
+
+                if (g.End.X > maxWidth)
+                {
+                    maxWidth = g.End.X;
+                }
+
+                if (g.End.X < minWidth)
+                {
+                    minWidth = g.End.X;
+                }
+
+                if (g.End.Y > maxHeight)
+                {
+                    maxHeight = g.End.Y;
+                }
+
+                if (g.End.Y < minHeight)
+                {
+                    minHeight = g.End.Y;
+                }
+            }
+
+            foreach (var g in OriginalRemnants.SelectMany(remnant => remnant.Profiles.SelectMany(p => p.Geometry)))
             {
                 if (g.Start.X > maxWidth)
                 {
@@ -461,13 +494,35 @@ namespace NxlReader
                 }
             }
 
-            // foreach (var t in Texts)
-            // {
-            // }
+            foreach (var t in Texts)
+            {
+                if (t.ReferencePoint.X > maxWidth)
+                {
+                    maxWidth = t.ReferencePoint.X;
+                }
 
-            r.Size = new Size((int)Math.Ceiling(maxWidth - minWidth), (int)Math.Ceiling(maxHeight - minHeight));
+                if (t.ReferencePoint.X < minWidth)
+                {
+                    minWidth = t.ReferencePoint.X;
+                }
 
-            return r;
+                if (t.ReferencePoint.Y > maxHeight)
+                {
+                    maxHeight = t.ReferencePoint.Y;
+                }
+
+                if (t.ReferencePoint.Y < minHeight)
+                {
+                    minHeight = t.ReferencePoint.Y;
+                }
+            }
+
+            var x = (int)Math.Ceiling(minWidth);
+            var y = (int)Math.Ceiling(minHeight);
+            var width = (int)Math.Ceiling(maxWidth - minWidth);
+            var height = (int)Math.Ceiling(maxHeight - minHeight);
+            
+            return new Rectangle(x,y,width,height);
         }
     }
 }

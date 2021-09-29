@@ -1,7 +1,11 @@
 {
   "profiles": {
     "Run Local": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "commandLineArgs": "-PARAMS=7,1,2,3,4,5,6",
+      "workingDirectory": "E:\\nestix\\bin\\report",
+      "sqlDebugging": true,
+      "nativeDebugging": true
     },
     "Run Working Machine": {
       "commandName": "Executable",

@@ -1,23 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Windows;
 using iText.Barcodes;
 using iText.IO.Font;
-using iText.IO.Image;
 using iText.Kernel.Font;
 using iText.Kernel.Geom;
 using iText.Kernel.Pdf;
-using iText.Kernel.Pdf.Canvas.Wmf;
-using iText.Kernel.Pdf.Xobject;
+using iText.Kernel.Pdf.Canvas;
 using iText.Layout;
 using iText.Layout.Borders;
 using iText.Layout.Element;
 using iText.Layout.Properties;
+using NxlReader.Drawer;
 using HorizontalAlignment = iText.Layout.Properties.HorizontalAlignment;
 using Path = System.IO.Path;
 using TextAlignment = iText.Layout.Properties.TextAlignment;
@@ -31,7 +26,7 @@ namespace Report
         private const int DefaultSecondPagePartsPerColumn = 39;
         private const int DefaultCellHeight = 16;
 
-        private static readonly string Consolas =
+        private readonly string _consolas =
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), "consola.ttf");
 
         private FontProgram _fontProgram;
@@ -67,7 +62,7 @@ namespace Report
 
         public byte[] ProcessNest(Nest d, string launch)
         {
-            _fontProgram = FontProgramFactory.CreateFont(Consolas);
+            _fontProgram = FontProgramFactory.CreateFont(_consolas);
             _font = PdfFontFactory.CreateFont(_fontProgram, PdfEncodings.IDENTITY_H,
                 PdfFontFactory.EmbeddingStrategy.PREFER_NOT_EMBEDDED);
 
@@ -112,50 +107,49 @@ namespace Report
             gasCell.SetPadding(0);
             gasCell.SetPaddingLeft(3);
 
-            if (d.PartsWeight.HasValue)
+
+            var gasInnerTable = new Table(UnitValue.CreatePercentArray(new[]
             {
-                var gasInnerTable = new Table(UnitValue.CreatePercentArray(new[]
-                {
-                    1f,
-                    0.9f
-                }));
+                1f,
+                0.9f
+            }));
 
-                gasInnerTable.SetHorizontalAlignment(HorizontalAlignment.LEFT);
-                gasInnerTable.SetWidth(UnitValue.CreatePercentValue(100));
-                gasInnerTable.SetFixedLayout();
+            gasInnerTable.SetHorizontalAlignment(HorizontalAlignment.LEFT);
+            gasInnerTable.SetWidth(UnitValue.CreatePercentValue(100));
+            gasInnerTable.SetFixedLayout();
 
-                gasInnerTable.AddCell(TextCell("Расход газов", true, colspan: 2));
+            gasInnerTable.AddCell(TextCell("Расход газов", true, colspan: 2));
 
-                var g = GasAmount.GetGas(d.Machine, d.Plate.Quality, d.PartsWeight.Value);
+            var g = GasAmount.GetGas(d.Machine, d.Plate.Quality, d.PartsWeight());
 
-                if (g.Oxygen > 0)
-                {
-                    gasInnerTable.AddCell(TextCell("Кислород, кг"));
-                    gasInnerTable.AddCell(TextCell(g.Oxygen.ToString("F3", CultureInfo.InvariantCulture).TrimEnd('0')));
-                }
-
-                if (g.Propan > 0)
-                {
-                    gasInnerTable.AddCell(TextCell("Пропан, кг"));
-                    gasInnerTable.AddCell(TextCell(g.Propan.ToString("F3", CultureInfo.InvariantCulture).TrimEnd('0')));
-                }
-
-                if (g.Nitrogen > 0)
-                {
-                    gasInnerTable.AddCell(TextCell("Азот, кг"));
-                    gasInnerTable.AddCell(
-                        TextCell(g.Nitrogen.ToString("F3", CultureInfo.InvariantCulture).TrimEnd('0')));
-                }
-
-                if (g.LaserMix > 0)
-                {
-                    gasInnerTable.AddCell(TextCell("Смесь, м3")); //"CO2 5% He 60% N2 35%, м3"
-                    gasInnerTable.AddCell(
-                        TextCell(g.LaserMix.ToString("F5", CultureInfo.InvariantCulture).TrimEnd('0')));
-                }
-
-                gasCell.Add(gasInnerTable);
+            if (g.Oxygen > 0)
+            {
+                gasInnerTable.AddCell(TextCell("Кислород, кг"));
+                gasInnerTable.AddCell(TextCell(g.Oxygen.ToString("F3", CultureInfo.InvariantCulture).TrimEnd('0')));
             }
+
+            if (g.Propan > 0)
+            {
+                gasInnerTable.AddCell(TextCell("Пропан, кг"));
+                gasInnerTable.AddCell(TextCell(g.Propan.ToString("F3", CultureInfo.InvariantCulture).TrimEnd('0')));
+            }
+
+            if (g.Nitrogen > 0)
+            {
+                gasInnerTable.AddCell(TextCell("Азот, кг"));
+                gasInnerTable.AddCell(
+                    TextCell(g.Nitrogen.ToString("F3", CultureInfo.InvariantCulture).TrimEnd('0')));
+            }
+
+            if (g.LaserMix > 0)
+            {
+                gasInnerTable.AddCell(TextCell("Смесь, м3")); //"CO2 5% He 60% N2 35%, м3"
+                gasInnerTable.AddCell(
+                    TextCell(g.LaserMix.ToString("F5", CultureInfo.InvariantCulture).TrimEnd('0')));
+            }
+
+            gasCell.Add(gasInnerTable);
+
 
             table.AddCell(gasCell);
 
@@ -187,10 +181,10 @@ namespace Report
             #endregion
 
             // second row
-            var orders = d.Parts.Select(x => x.Order).Distinct();
-            var order = orders.Count() > 1 ? "Несколько" : d.Parts[0].Order;
+            var orders = d.Parts.Where(x => !string.IsNullOrWhiteSpace(x.Project)).Select(x => x.Project).Distinct();
+            var order = orders.Count() > 1 ? "Несколько" : d.Parts[0].Project;
 
-            var sections = d.Parts.Select(x => x.Section).Distinct().ToList();
+            var sections = d.Parts.Where(x => !string.IsNullOrWhiteSpace(x.Section)).Select(x => x.Section).Distinct().ToList();
 
             string section;
             switch (sections.Count)
@@ -273,7 +267,9 @@ namespace Report
 
             table.AddCell(TextCell("Масса мат. / дет. кг", true));
             table.AddCell(
-                TextCell($"{(d.MatWeight == 0.0 ? d.Plate.NestGrossWeight : d.MatWeight):F1} / {d.PartsWeight:F1}"));
+                //TextCell($"{(d.MatWeight == 0.0 ? d.Plate.NestGrossWeight : d.MatWeight):F1} / {d.PartsWeight:F1}"));
+                TextCell($"{(d.Plate.NestGrossWeight):F1} / {d.PartsWeight():F1}"));
+
 
             table.AddCell(TextCell("Масса ДМО, кг", true));
             table.AddCell(TextCell($"{d.RemnantWeight:F1}"));
@@ -291,7 +287,7 @@ namespace Report
             lp.SetTextAlignment(TextAlignment.RIGHT);
 
             lp.SetFont(_font);
-            lp.SetFontSize(10);
+            lp.SetFontSize(12);
 
             lp.SetHeight(DefaultCellHeight);
 
@@ -510,13 +506,7 @@ namespace Report
                 {
                     var p = d.Parts[i];
 
-                    var detid = p.DetailCode;
-                    if (detid == "0")
-                    {
-                        detid = "x";
-                    }
-
-                    partsTable.AddCell(TextCell(detid, fontSize: 8));
+                    partsTable.AddCell(TextCell(p.DetailCode.ToString(), fontSize: 8));
 
                     string pos = "";
 
@@ -543,7 +533,7 @@ namespace Report
                         }
                     }
 
-                    partsTable.AddCell(TextCell(pos, fontSize: 7));
+                    partsTable.AddCell(TextCell(pos, fontSize: 8));
 
                     partsTable.AddCell(TextCell(p.DetailCount.ToString(), fontSize: 8));
                     partsTable.AddCell(TextCell($"{p.Weight:F1}", fontSize: 8));
@@ -574,18 +564,19 @@ namespace Report
             var page = pdf.GetPage(1);
             var canvas = new PdfCanvas(page);
 
-            var rect = new Rectangle(280, 50, 870, 650);
-            canvas.Rectangle(rect);
-            canvas.Stroke();
+            var rect = new Rectangle(270, 36, 910, 700);
+            //canvas.Rectangle(rect);
+            //canvas.Stroke();
 
-            NxlReader.Drawer.Pdf.Draw(canvas, rect, nest);
+            var dr = new Pdf();
+            dr.Draw(canvas, rect, nest);
 #endif
 
             #endregion
 
             #region parts page
 
-            if (d.PartsCount > _firstPagePartsCount)
+            if (d.Parts.Count > _firstPagePartsCount)
             {
                 var remainParts = d.Parts.Skip(_firstPagePartsCount).ToList();
 
@@ -630,13 +621,7 @@ namespace Report
                                 if (p == remainParts[remainParts.Count - 1])
                                 {
                                     // last part
-                                    var detid = p.DetailCode;
-                                    if (detid == "0")
-                                    {
-                                        detid = "x";
-                                    }
-
-                                    p2.AddCell(TextCell(detid, fontSize: 8));
+                                    p2.AddCell(TextCell(p.DetailCode.ToString(), fontSize: 8));
 
                                     string pos = "";
 
@@ -673,13 +658,7 @@ namespace Report
                                 }
                                 else
                                 {
-                                    var detid = p.DetailCode;
-                                    if (detid == "0")
-                                    {
-                                        detid = "x";
-                                    }
-
-                                    p2.AddCell(TextCell(detid, fontSize: 8));
+                                    p2.AddCell(TextCell(p.DetailCode.ToString(), fontSize: 8));
 
                                     string pos = "";
 
