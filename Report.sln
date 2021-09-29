@@ -4,13 +4,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 16.0.30709.64
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Report", "Report\Report.csproj", "{E17DF172-F623-482C-AED2-5698A0936A84}"
-	ProjectSection(ProjectDependencies) = postProject
-		{D03EED6B-5F16-4C46-A5C7-CCEE95556CB3} = {D03EED6B-5F16-4C46-A5C7-CCEE95556CB3}
-	EndProjectSection
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NxlReader", "NxlReader\NxlReader.csproj", "{D03EED6B-5F16-4C46-A5C7-CCEE95556CB3}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NxlReaderTestApp", "NxlReaderTestApp\NxlReaderTestApp.csproj", "{715A11BD-A66C-4854-BF4E-F3528251A509}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -28,22 +21,6 @@ Global
 		{E17DF172-F623-482C-AED2-5698A0936A84}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E17DF172-F623-482C-AED2-5698A0936A84}.Release|x64.ActiveCfg = Release|x64
 		{E17DF172-F623-482C-AED2-5698A0936A84}.Release|x64.Build.0 = Release|x64
-		{D03EED6B-5F16-4C46-A5C7-CCEE95556CB3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D03EED6B-5F16-4C46-A5C7-CCEE95556CB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D03EED6B-5F16-4C46-A5C7-CCEE95556CB3}.Debug|x64.ActiveCfg = Debug|x64
-		{D03EED6B-5F16-4C46-A5C7-CCEE95556CB3}.Debug|x64.Build.0 = Debug|x64
-		{D03EED6B-5F16-4C46-A5C7-CCEE95556CB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D03EED6B-5F16-4C46-A5C7-CCEE95556CB3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D03EED6B-5F16-4C46-A5C7-CCEE95556CB3}.Release|x64.ActiveCfg = Release|x64
-		{D03EED6B-5F16-4C46-A5C7-CCEE95556CB3}.Release|x64.Build.0 = Release|x64
-		{715A11BD-A66C-4854-BF4E-F3528251A509}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{715A11BD-A66C-4854-BF4E-F3528251A509}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{715A11BD-A66C-4854-BF4E-F3528251A509}.Debug|x64.ActiveCfg = Debug|x64
-		{715A11BD-A66C-4854-BF4E-F3528251A509}.Debug|x64.Build.0 = Debug|x64
-		{715A11BD-A66C-4854-BF4E-F3528251A509}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{715A11BD-A66C-4854-BF4E-F3528251A509}.Release|Any CPU.Build.0 = Release|Any CPU
-		{715A11BD-A66C-4854-BF4E-F3528251A509}.Release|x64.ActiveCfg = Release|x64
-		{715A11BD-A66C-4854-BF4E-F3528251A509}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

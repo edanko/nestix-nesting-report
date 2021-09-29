@@ -1,4 +1,4 @@
-﻿using IxMilia.Dxf;
+﻿/*using IxMilia.Dxf;
 using IxMilia.Dxf.Entities;
 
 namespace NxlReader.Drawer
@@ -14,4 +14,4 @@ namespace NxlReader.Drawer
             dxfFile.Save(filename);
         }
     }
-}
+}*/

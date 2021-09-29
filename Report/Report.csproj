@@ -6,6 +6,7 @@
 		<OutputType>WinExe</OutputType>
 		<TargetFramework>net472</TargetFramework>
 		<SignAssembly>false</SignAssembly>
+		<LangVersion>latest</LangVersion>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 	  <DefineConstants>$(DefineConstants)TRACE;NOT_USE_EMF</DefineConstants>
@@ -24,9 +25,7 @@
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="itext7" Version="7.1.16" />
-	</ItemGroup>
-	<ItemGroup>
-		<ProjectReference Include="..\NxlReader\NxlReader.csproj" />
+		<PackageReference Include="SvgNet" Version="2.1.6" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System" />
@@ -40,10 +39,6 @@
 		<Reference Include="WindowsBase" />
 		<Reference Include="PresentationCore" />
 		<Reference Include="PresentationFramework" />
-	</ItemGroup>
-	<ItemGroup>
-		<None Include="App.config" />
-		<None Include="SmartThreadPool\SmartThreadPool.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 		<Page Include="Launch.xaml" />

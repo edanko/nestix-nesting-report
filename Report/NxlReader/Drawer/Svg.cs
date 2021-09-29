@@ -6,11 +6,11 @@ using SvgNet.SvgGdi;
 
 namespace NxlReader.Drawer
 {
-    public static class Svg
+    public class Svg
     {
-        private static SvgGraphics _g;
+        private SvgGraphics _g;
 
-        public static string Draw(Nest n)
+        public string Draw(Nest n)
         {
             _g = new SvgGraphics(Color.White);
             _g.ScaleTransform(1, -1);
@@ -35,7 +35,7 @@ namespace NxlReader.Drawer
             return _g.WriteSVGString();
         }
 
-        private static void DrawProfile(Profile p)
+        private void DrawProfile(Profile p)
         {
             //if (p.MachiningMode != "0")
             //{
@@ -57,7 +57,7 @@ namespace NxlReader.Drawer
             }
         }
 
-        private static void DrawLine(IElement e, Color color, int width)
+        private void DrawLine(IElement e, Color color, int width)
         {
             var drawBrush = new SolidBrush(color);
 
@@ -69,7 +69,7 @@ namespace NxlReader.Drawer
             _g.DrawLine(drawPen, e.Start.X, e.Start.Y, e.End.X, e.End.Y);
         }
 
-        private static void DrawArc(IElement e, Color color, int width)
+        private void DrawArc(IElement e, Color color, int width)
         {
             var el = (Arc)e;
 
@@ -192,7 +192,7 @@ namespace NxlReader.Drawer
             TranslateTransform(0 - t.ReferencePoint.X, 0 - t.ReferencePoint.Y)
         };*/
 
-        private static void DrawTextProfile(TextProfile t)
+        private void DrawTextProfile(TextProfile t)
         {
             if (string.IsNullOrEmpty(t.Text))
             {
@@ -231,7 +231,7 @@ namespace NxlReader.Drawer
             _g.TranslateTransform(0 - t.ReferencePoint.X, 0 - t.ReferencePoint.Y);
         }
 
-        private static void DrawSheet(Plate p)
+        private void DrawSheet(Plate p)
         {
             foreach (var e in p.Profiles.SelectMany(t => t.Geometry))
             {
