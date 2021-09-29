@@ -1,16 +1,20 @@
 ﻿using System;
-using iText.IO.Font.Constants;
+using iText.IO.Font;
 using iText.Kernel.Font;
 using iText.Kernel.Geom;
 using iText.Kernel.Pdf.Canvas;
+using Path = System.IO.Path;
 
 namespace NxlReader.Drawer
 {
-    public static class Pdf
+    public class Pdf
     {
-        private static PdfCanvas _c;
+        private PdfCanvas _c;
 
-        public static void Draw(PdfCanvas c, Rectangle rect, Nest n)
+        private readonly string _consolas =
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), "consola.ttf");
+
+        public void Draw(PdfCanvas c, Rectangle rect, Nest n)
         {
             _c = c;
 
@@ -21,7 +25,11 @@ namespace NxlReader.Drawer
             var scale = Math.Min(w, h);
 
             var tr = new AffineTransform();
-            tr.Translate(rect.GetX(), rect.GetHeight() / 2);
+
+            float trX = Math.Abs(bb.X) * scale + rect.GetX();
+            float trY = rect.GetY() + (rect.GetHeight() / 2 - bb.Height * scale / 2);
+
+            tr.Translate(trX, trY);
             tr.Scale(scale, scale);
             _c.ConcatMatrix(tr);
 
@@ -59,7 +67,7 @@ namespace NxlReader.Drawer
                 DrawTextProfile(text);
             }
 
-            foreach (var e in n.DimensionLineAnnotations)
+            /*foreach (var e in n.DimensionLineAnnotations)
             {
                 _c.MoveTo(e.Start.X, e.Start.Y);
                 _c.LineTo(e.End.X, e.End.Y);
@@ -83,10 +91,10 @@ namespace NxlReader.Drawer
 
                 _c.ShowText(e.GetLength());
                 _c.EndText();
-            }
+            }*/
         }
 
-        private static void DrawProfile(Profile p)
+        private void DrawProfile(Profile p)
         {
             foreach (var e in p.Geometry)
             {
@@ -103,7 +111,7 @@ namespace NxlReader.Drawer
             }
         }
 
-        private static void DrawLine(IElement e)
+        private void DrawLine(IElement e)
         {
             _c.MoveTo(e.Start.X, e.Start.Y);
             _c.LineTo(e.End.X, e.End.Y);
@@ -111,7 +119,7 @@ namespace NxlReader.Drawer
             _c.FillStroke();
         }
 
-        private static void DrawArc(IElement e)
+        private void DrawArc(IElement e)
         {
             var el = (Arc)e;
 
@@ -119,55 +127,56 @@ namespace NxlReader.Drawer
             var y = el.Center.Y - el.Radius;
             var num = Math.Abs(el.Radius * 2.0);
 
-            _c.Arc(x, y, x + num, y + num, el.StartAngle, el.SweepAngle);
+            var startAngle = el.StartAngle;
+            var sweepAngle = el.SweepAngle;
+
+            if (Math.Abs(sweepAngle) < 1 || el.Radius > 30000)
+            {
+                _c.MoveTo(e.Start.X, e.Start.Y);
+                _c.LineTo(e.End.X, e.End.Y);
+                _c.SetLineWidth(2);
+                _c.FillStroke();
+
+                return;
+            }
+
+            _c.Arc(x, y, x + num, y + num, startAngle, sweepAngle);
             _c.SetLineWidth(2);
             _c.Stroke();
         }
 
-        private static void DrawTextProfile(TextProfile t)
+        private void DrawTextProfile(TextProfile t)
         {
             if (string.IsNullOrEmpty(t.Text))
             {
                 return;
             }
 
-            PdfFont font = PdfFontFactory.CreateFont(StandardFonts.COURIER);
+            var fontProgram = FontProgramFactory.CreateFont(_consolas);
+            var font = PdfFontFactory.CreateFont(fontProgram, PdfEncodings.IDENTITY_H,
+                PdfFontFactory.EmbeddingStrategy.PREFER_NOT_EMBEDDED);
 
-            _c.BeginText();
-            _c.SetFontAndSize(font, t.Height);
+            var lines = t.Text.Split('\n');
 
-            var m = new AffineTransform();
-            m.SetTransform(t.Matrix.M[0], t.Matrix.M[1], t.Matrix.M[3], t.Matrix.M[4], t.ReferencePoint.X,
-                t.ReferencePoint.Y);
-            m.Rotate(t.Angle * Math.PI / 180);
-            _c.SetTextMatrix(m);
+            for (int i = 0; i < lines.Length; i++)
+            {
+                var line = lines[i];
 
-            //var radians = Math.Atan2(m.GetShearY(), m.GetScaleX());
-            //var degrees = radians * 180 / Math.PI;
+                _c.BeginText();
+                _c.SetFontAndSize(font, t.Height);
 
+                var m = new AffineTransform();
+                m.SetTransform(t.Matrix.M[0], t.Matrix.M[1], t.Matrix.M[3], t.Matrix.M[4], t.ReferencePoint.X,
+                    t.ReferencePoint.Y - i * (t.Height + 2));
+                m.Rotate(t.Angle * Math.PI / 180);
+                _c.SetTextMatrix(m);
 
-            _c.ShowText(t.Text);
-            _c.EndText();
-
-            /*var path = new GraphicsPath();
-
-            path.AddString(t.Text, FontFamily.GenericSansSerif, (int) FontStyle.Regular,
-                t.Height, new PointF(0, -t.Height), StringFormat.GenericDefault);
-
-            var matrix = new Matrix();
-            matrix.Rotate(-t.Angle);
-            path.Transform(matrix);
-            
-            matrix = new Matrix();
-            matrix.Scale(1f, -1f);
-            path.Transform(matrix);
-
-            matrix = new Matrix((float) t.Matrix.m[0], (float) t.Matrix.m[1], (float) t.Matrix.m[3],
-                 (float) t.Matrix.m[4], 0, 0);
-            path.Transform(matrix);*/
+                _c.ShowText(line);
+                _c.EndText();
+            }
         }
 
-        private static void DrawSheet(Plate p)
+        private void DrawSheet(Plate p)
         {
             foreach (var t in p.Profiles)
             {
@@ -180,7 +189,7 @@ namespace NxlReader.Drawer
             }
         }
 
-        private static void DrawRemnant(Remnant r)
+        private void DrawRemnant(Remnant r)
         {
             foreach (var t in r.Profiles)
             {

@@ -35,7 +35,8 @@ namespace NxlReaderTestApp
                 c.Rectangle(rect);
                 c.Stroke();
 
-                Pdf.Draw(c, rect, n);
+                var dr = new Pdf();
+                dr.Draw(c, rect, n);
 
                 var folder = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
                 var resultFilename = Path.Combine(folder, "Карты раскроя");
