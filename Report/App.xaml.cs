@@ -94,10 +94,12 @@ namespace Report
                 return;
             }
 
-            var launchWindow = new Launch();
+            string launch = "зап. вручную";
             if (mdList.Count > 1)
             {
+                var launchWindow = new Launch();
                 launchWindow.ShowDialog();
+                launch = launchWindow.LaunchString;
             }
 
             var stp = new SmartThreadPool.SmartThreadPool();
@@ -109,7 +111,7 @@ namespace Report
                 stp.QueueWorkItem(() =>
                 {
                     var rep = new PdfReport();
-                    var bytes = rep.ProcessNest(m, launchWindow.LaunchString);
+                    var bytes = rep.ProcessNest(m, launch);
                     all.TryAdd(m.NcName, bytes);
                 });
             }
@@ -147,9 +149,7 @@ namespace Report
                 Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), "consola.ttf");
 
             var fontProgram = FontProgramFactory.CreateFont(ttf);
-#pragma warning disable 618
-            var font = PdfFontFactory.CreateFont(fontProgram, PdfEncodings.IDENTITY_H, true);
-#pragma warning restore 618
+            var font = PdfFontFactory.CreateFont(fontProgram, PdfEncodings.IDENTITY_H, PdfFontFactory.EmbeddingStrategy.PREFER_NOT_EMBEDDED);
 
             var outPdfStream = new MemoryStream();
 
@@ -212,9 +212,9 @@ namespace Report
 
             string file;
 
-            if (string.IsNullOrWhiteSpace(launchWindow.LaunchString) || launchWindow.LaunchString != "зап. вручную")
+            if (string.IsNullOrWhiteSpace(launch) || launch != "зап. вручную")
             {
-                file = $"{launchWindow.LaunchString}.pdf";
+                file = $"{launch}.pdf";
             }
             else
             {
@@ -260,6 +260,8 @@ namespace Report
             Process.Start(psi);
 
             #endregion
+
+            Environment.Exit(0);
         }
 
         private static string GetDataSource(string iniPath)

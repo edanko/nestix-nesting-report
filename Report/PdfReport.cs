@@ -63,8 +63,7 @@ namespace Report
         public byte[] ProcessNest(Nest d, string launch)
         {
             _fontProgram = FontProgramFactory.CreateFont(_consolas);
-            _font = PdfFontFactory.CreateFont(_fontProgram, PdfEncodings.IDENTITY_H,
-                PdfFontFactory.EmbeddingStrategy.PREFER_NOT_EMBEDDED);
+            _font = PdfFontFactory.CreateFont(_fontProgram, PdfEncodings.IDENTITY_H, PdfFontFactory.EmbeddingStrategy.PREFER_NOT_EMBEDDED);
 
             var fs = new MemoryStream();
 
@@ -187,19 +186,12 @@ namespace Report
             var sections = d.Parts.Where(x => !string.IsNullOrWhiteSpace(x.Section)).Select(x => x.Section).Distinct()
                 .ToList();
 
-            string section;
-            switch (sections.Count)
+            var section = sections.Count switch
             {
-                case 2:
-                    section = $"{sections[0]}, {sections[1]}";
-                    break;
-                case 1:
-                    section = $"{sections[0]}";
-                    break;
-                default:
-                    section = "Несколько";
-                    break;
-            }
+                2 => $"{sections[0]}, {sections[1]}",
+                1 => $"{sections[0]}",
+                _ => "Несколько"
+            };
 
             table.AddCell(TextCell(order));
             table.AddCell(TextCell(section));
@@ -237,25 +229,14 @@ namespace Report
             // fourth row
             table.AddCell(TextCell("МТР (Технология)", true));
 
-            string tech;
-            switch (d.Machine)
+            var tech = d.Machine switch
             {
-                case "PlasmaBevelOmniMatL8000":
-                    tech = "OM8000 (Plasma)";
-                    break;
-                case "GasBevelOmniMatL8000":
-                    tech = "OM8000 (Gas)";
-                    break;
-                case "LaserMat4200":
-                    tech = "LM4200";
-                    break;
-                case "GasOmniMatL7000":
-                    tech = "OM7000 (Gas)";
-                    break;
-                default:
-                    tech = d.Machine;
-                    break;
-            }
+                "PlasmaBevelOmniMatL8000" => "OM8000 (Plasma)",
+                "GasBevelOmniMatL8000" => "OM8000 (Gas)",
+                "LaserMat4200" => "LM4200",
+                "GasOmniMatL7000" => "OM7000 (Gas)",
+                _ => d.Machine
+            };
 
             if (d.Machine == "PlasmaBevelOmniMatL8000" && nest.Machine != null)
             {
@@ -288,7 +269,7 @@ namespace Report
             lp.SetTextAlignment(TextAlignment.RIGHT);
 
             lp.SetFont(_font);
-            lp.SetFontSize(12);
+            lp.SetFontSize(10);
 
             lp.SetHeight(DefaultCellHeight);
 

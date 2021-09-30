@@ -130,7 +130,7 @@ namespace Report.NxlReader.Drawer
             var startAngle = el.StartAngle;
             var sweepAngle = el.SweepAngle;
 
-            if (Math.Abs(sweepAngle) < 1 || el.Radius > 30000)
+            if (Math.Abs(sweepAngle) < 3 || el.Radius > 10000)
             {
                 _c.MoveTo(e.Start.X, e.Start.Y);
                 _c.LineTo(e.End.X, e.End.Y);
