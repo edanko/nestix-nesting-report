@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using System.Xml.Linq;
 
-namespace NxlReader
+namespace Report.NxlReader
 {
     public class TextProfile
     {
@@ -35,8 +35,10 @@ namespace NxlReader
                 StaticAngle = node.Element("StaticAngle")?.Value,
                 ReferencePoint = new Point
                 {
-                    X = float.Parse(node.Element("ReferencePoint")?.Attribute("X")?.Value!, CultureInfo.InvariantCulture),
-                    Y = float.Parse(node.Element("ReferencePoint")?.Attribute("Y")?.Value!, CultureInfo.InvariantCulture)
+                    X = float.Parse(node.Element("ReferencePoint")?.Attribute("X")?.Value!,
+                        CultureInfo.InvariantCulture),
+                    Y = float.Parse(node.Element("ReferencePoint")?.Attribute("Y")?.Value!,
+                        CultureInfo.InvariantCulture)
                 }
             };
 

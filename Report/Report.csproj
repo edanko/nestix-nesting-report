@@ -9,16 +9,16 @@
 		<LangVersion>latest</LangVersion>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-	  <DefineConstants>$(DefineConstants)TRACE;NOT_USE_EMF</DefineConstants>
+		<DefineConstants>$(DefineConstants)TRACE;NOT_USE_EMF</DefineConstants>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-	  <DefineConstants>$(DefineConstants)TRACE;NOT_USE_EMF</DefineConstants>
+		<DefineConstants>$(DefineConstants)TRACE;NOT_USE_EMF</DefineConstants>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-	  <DefineConstants>$(DefineConstants)TRACE;NOT_USE_EMF</DefineConstants>
+		<DefineConstants>$(DefineConstants)TRACE;NOT_USE_EMF</DefineConstants>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-	  <DefineConstants>$(DefineConstants)TRACE;NOT_USE_EMF</DefineConstants>
+		<DefineConstants>$(DefineConstants)TRACE;NOT_USE_EMF</DefineConstants>
 	</PropertyGroup>
 	<ItemGroup>
 		<ApplicationDefinition Include="App.xaml" />
@@ -44,8 +44,8 @@
 		<Page Include="Launch.xaml" />
 	</ItemGroup>
 	<ItemGroup>
-	  <None Update="1.ico">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
+		<None Update="1.ico">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
 	</ItemGroup>
 </Project>

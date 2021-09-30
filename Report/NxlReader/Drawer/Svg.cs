@@ -4,7 +4,7 @@ using System.Drawing.Drawing2D;
 using System.Linq;
 using SvgNet.SvgGdi;
 
-namespace NxlReader.Drawer
+namespace Report.NxlReader.Drawer
 {
     public class Svg
     {
@@ -14,7 +14,7 @@ namespace NxlReader.Drawer
         {
             _g = new SvgGraphics(Color.White);
             _g.ScaleTransform(1, -1);
-            
+
             DrawSheet(n.Plate);
 
             foreach (var p in n.Parts)

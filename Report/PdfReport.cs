@@ -12,7 +12,7 @@ using iText.Layout;
 using iText.Layout.Borders;
 using iText.Layout.Element;
 using iText.Layout.Properties;
-using NxlReader.Drawer;
+using Report.NxlReader.Drawer;
 using HorizontalAlignment = iText.Layout.Properties.HorizontalAlignment;
 using Path = System.IO.Path;
 using TextAlignment = iText.Layout.Properties.TextAlignment;
@@ -184,7 +184,8 @@ namespace Report
             var orders = d.Parts.Where(x => !string.IsNullOrWhiteSpace(x.Project)).Select(x => x.Project).Distinct();
             var order = orders.Count() > 1 ? "Несколько" : d.Parts[0].Project;
 
-            var sections = d.Parts.Where(x => !string.IsNullOrWhiteSpace(x.Section)).Select(x => x.Section).Distinct().ToList();
+            var sections = d.Parts.Where(x => !string.IsNullOrWhiteSpace(x.Section)).Select(x => x.Section).Distinct()
+                .ToList();
 
             string section;
             switch (sections.Count)

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using NxlReader.FastClone.Internal;
+using Report.FastClone.Internal;
 
-namespace NxlReader.FastClone
+namespace Report.FastClone
 {
     public static class Cloner
     {

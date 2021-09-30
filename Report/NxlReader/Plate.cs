@@ -1,17 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.Xml.Linq;
 
-namespace NxlReader
+namespace Report.NxlReader
 {
     public class Plate
     {
         public List<Profile> Profiles { get; set; } = new();
         public List<TextProfile> Texts { get; set; } = new();
-        
+
         public Plate(XElement n)
         {
             Read(n);
         }
+
         public void Read(XElement n)
         {
             if (n.Element("Profiles") != null)

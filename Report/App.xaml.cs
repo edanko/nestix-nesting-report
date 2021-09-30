@@ -68,7 +68,7 @@ namespace Report
                 MessageBox.Show("Директория master не найдена", "Ошибка");
                 return;
             }
-            
+
             var connectionString = GetDataSource($@"{dir}\settings\nestix2.ini");
 
             if (string.IsNullOrWhiteSpace(connectionString))
@@ -76,7 +76,7 @@ namespace Report
                 MessageBox.Show("Имя базы данных не найдено в nestix2.ini", "Ошибка");
                 return;
             }
-            
+
             var mdList = new List<Nest>();
 
             var sqlConnection = new SqlConnection(connectionString);
@@ -209,7 +209,7 @@ namespace Report
             pdfDoc.Close();
 
             #endregion
-            
+
             string file;
 
             if (string.IsNullOrWhiteSpace(launchWindow.LaunchString) || launchWindow.LaunchString != "зап. вручную")
@@ -279,7 +279,7 @@ namespace Report
                     continue;
                 }
 
-                return l.Split(new[] {';'}, 2)[1];
+                return l.Split(new[] { ';' }, 2)[1];
             }
 
             return db;

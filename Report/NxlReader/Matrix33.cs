@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using System.Xml.Linq;
 
-namespace NxlReader
+namespace Report.NxlReader
 {
     public class Matrix33
     {

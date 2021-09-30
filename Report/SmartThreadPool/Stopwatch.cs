@@ -31,6 +31,7 @@ namespace Report.SmartThreadPool
                 long ticks = GetTimestamp() - _startTimeStamp;
                 elapsed += ticks;
             }
+
             return elapsed;
         }
 
@@ -41,9 +42,9 @@ namespace Report.SmartThreadPool
 
         public void Reset()
         {
-           _elapsed = 0L;
-           _isRunning = false;
-           _startTimeStamp = 0L;
+            _elapsed = 0L;
+            _isRunning = false;
+            _startTimeStamp = 0L;
         }
 
         public void Start()
@@ -75,34 +76,22 @@ namespace Report.SmartThreadPool
         // Properties
         public TimeSpan Elapsed
         {
-            get
-            {
-                return new TimeSpan(GetElapsedDateTimeTicks());
-            }
+            get { return new TimeSpan(GetElapsedDateTimeTicks()); }
         }
 
         public long ElapsedMilliseconds
         {
-            get
-            {
-                return (GetElapsedDateTimeTicks() / 0x2710L);
-            }
+            get { return (GetElapsedDateTimeTicks() / 0x2710L); }
         }
 
         public long ElapsedTicks
         {
-            get
-            {
-                return GetRawElapsedTicks();
-            }
+            get { return GetRawElapsedTicks(); }
         }
 
         public bool IsRunning
         {
-            get
-            {
-                return _isRunning;
-            }
+            get { return _isRunning; }
         }
     }
 }

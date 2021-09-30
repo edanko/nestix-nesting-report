@@ -1,6 +1,6 @@
 ﻿using System.Xml.Linq;
 
-namespace NxlReader
+namespace Report.NxlReader
 {
     public class Technology
     {

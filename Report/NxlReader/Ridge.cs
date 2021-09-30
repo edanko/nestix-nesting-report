@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using System.Xml.Linq;
 
-namespace NxlReader
+namespace Report.NxlReader
 {
     public class Ridge
     {
@@ -19,7 +19,8 @@ namespace NxlReader
                 EndId = int.Parse(node.Element("BridgeEnd")?.Attribute("id")?.Value!),
 
                 Type = node.Element("Parameters")?.Element("Type")?.Value,
-                Radius = float.Parse(node.Element("Parameters")?.Element("Radius")?.Value!, CultureInfo.InvariantCulture),
+                Radius = float.Parse(node.Element("Parameters")?.Element("Radius")?.Value!,
+                    CultureInfo.InvariantCulture),
                 Distance = float.Parse(node.Element("Parameters")?.Element("Distance")?.Value!,
                     CultureInfo.InvariantCulture)
             };

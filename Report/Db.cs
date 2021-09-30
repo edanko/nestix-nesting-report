@@ -200,11 +200,18 @@ startcount as StartCount,
 starttime as StartTime_min,
 machtime + starttime as TotalTime_min,
 pathid
-from (SELECT ROW_NUMBER() OVER (ORDER BY nxpathid ASC) AS machstaticid, nxpathid AS pathid, rtrim(ltrim(tool.value('./toolname[1]', 'nvarchar(50)'))) AS tooltype, rtrim(ltrim(tool.value('./bevel[1]/beveltext[1]', 'nvarchar(50)'))) AS toolname, (dbo.NxDbCharToFloat(tool.value('./totaltime[1]', 'nvarchar(50)')) 
-/ CASE tool.value('./totaltimeunit[1]', 'nvarchar(50)') WHEN 'min' THEN 1 ELSE 60 END) - (dbo.NxDbCharToFloat(tool.value('./piercetime[1]', 'nvarchar(50)')) / CASE tool.value('./piercetimeunit[1]', 'nvarchar(50)') 
-WHEN 'min' THEN 1 ELSE 60 END) AS machtime, tool.value('./piercecnt[1]', 'int') AS startcount, dbo.NxDbCharToFloat(tool.value('./piercetime[1]', 'nvarchar(50)')) / CASE tool.value('./piercetimeunit[1]', 'nvarchar(50)') 
-WHEN 'min' THEN 1 ELSE 60 END AS starttime, dbo.NxDbCharToFloat(tool.value('./totallength[1]', 'nvarchar(50)')) * CASE tool.value('./totallengthunit[1]', 'nvarchar(50)') WHEN 'mm' THEN 1 ELSE 1000 END AS machdist, 0 AS compvalue, 
-'min' AS timeunit, 'mm' AS distunit
+
+from (SELECT ROW_NUMBER() OVER (ORDER BY nxpathid ASC) AS machstaticid,
+nxpathid AS pathid,
+rtrim(ltrim(tool.value('./toolname[1]', 'nvarchar(50)'))) AS tooltype,
+rtrim(ltrim(tool.value('./bevel[1]/beveltext[1]', 'nvarchar(50)'))) AS toolname,
+(dbo.NxDbCharToFloat(tool.value('./totaltime[1]', 'nvarchar(50)')) / CASE tool.value('./totaltimeunit[1]', 'nvarchar(50)') WHEN 'min' THEN 1 ELSE 60 END) - (dbo.NxDbCharToFloat(tool.value('./piercetime[1]', 'nvarchar(50)')) / CASE tool.value('./piercetimeunit[1]', 'nvarchar(50)') WHEN 'min' THEN 1 ELSE 60 END) AS machtime, 
+tool.value('./piercecnt[1]', 'int') AS startcount, dbo.NxDbCharToFloat(tool.value('./piercetime[1]', 'nvarchar(50)')) / CASE tool.value('./piercetimeunit[1]', 'nvarchar(50)') 
+WHEN 'min' THEN 1 ELSE 60 END AS starttime, 
+dbo.NxDbCharToFloat(tool.value('./totallength[1]', 'nvarchar(50)')) * CASE tool.value('./totallengthunit[1]', 'nvarchar(50)') WHEN 'mm' THEN 1 ELSE 1000 END AS machdist, 
+0 AS compvalue, 
+'min' AS timeunit, 
+'mm' AS distunit
 FROM nxpath WITH (nolock) CROSS apply nxpath.nxpthtooldata.nodes('//nestdata/machstatic/tool') AS t (tool)) as machstatic
 where pathid = (@pathid)";
 

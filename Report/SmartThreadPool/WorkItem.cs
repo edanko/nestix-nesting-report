@@ -16,10 +16,10 @@ namespace Report.SmartThreadPool
         /// </summary>
         private enum WorkItemState
         {
-            InQueue = 0,    // Nexts: InProgress, Canceled
-            InProgress = 1,    // Nexts: Completed, Canceled
-            Completed = 2,    // Stays Completed
-            Canceled = 3,    // Stays Canceled
+            InQueue = 0, // Nexts: InProgress, Canceled
+            InProgress = 1, // Nexts: Completed, Canceled
+            Completed = 2, // Stays Completed
+            Canceled = 3, // Stays Canceled
         }
 
         private static bool IsValidStatesTransition(WorkItemState currentState, WorkItemState nextState)
@@ -143,9 +143,6 @@ namespace Report.SmartThreadPool
 
         #region Performance Counter fields
 
-
-
-
         /// <summary>
         /// Stores how long the work item waited on the stp queue
         /// </summary>
@@ -164,26 +161,17 @@ namespace Report.SmartThreadPool
 
         public TimeSpan WaitingTime
         {
-            get
-            {
-                return _waitingOnQueueStopwatch.Elapsed;
-            }
+            get { return _waitingOnQueueStopwatch.Elapsed; }
         }
 
         public TimeSpan ProcessTime
         {
-            get
-            {
-                return _processingStopwatch.Elapsed;
-            }
+            get { return _processingStopwatch.Elapsed; }
         }
 
         internal WorkItemInfo WorkItemInfo
         {
-            get
-            {
-                return _workItemInfo;
-            }
+            get { return _workItemInfo; }
         }
 
         #endregion
@@ -212,7 +200,8 @@ namespace Report.SmartThreadPool
 #if (NETFRAMEWORK)
             if (_workItemInfo.UseCallerCallContext || _workItemInfo.UseCallerHttpContext)
             {
-                _callerContext = CallerThreadContext.Capture(_workItemInfo.UseCallerCallContext, _workItemInfo.UseCallerHttpContext);
+                _callerContext = CallerThreadContext.Capture(_workItemInfo.UseCallerCallContext,
+                    _workItemInfo.UseCallerHttpContext);
             }
 #endif
 
@@ -233,16 +222,15 @@ namespace Report.SmartThreadPool
             _waitingOnQueueStopwatch = new Stopwatch();
             _processingStopwatch = new Stopwatch();
             _expirationTime =
-                _workItemInfo.Timeout > 0 ?
-                DateTime.UtcNow.Ticks + _workItemInfo.Timeout * TimeSpan.TicksPerMillisecond :
-                long.MaxValue;
+                _workItemInfo.Timeout > 0
+                    ? DateTime.UtcNow.Ticks + _workItemInfo.Timeout * TimeSpan.TicksPerMillisecond
+                    : long.MaxValue;
         }
 
         internal bool WasQueuedBy(IWorkItemsGroup workItemsGroup)
         {
             return (workItemsGroup == _workItemsGroup);
         }
-
 
         #endregion
 
@@ -278,7 +266,8 @@ namespace Report.SmartThreadPool
                 {
                     bool result = false;
                     if ((_workItemInfo.PostExecuteWorkItemCallback != null) &&
-                        ((_workItemInfo.CallToPostExecute & CallToPostExecute.WhenWorkItemCanceled) == CallToPostExecute.WhenWorkItemCanceled))
+                        ((_workItemInfo.CallToPostExecute & CallToPostExecute.WhenWorkItemCanceled) ==
+                         CallToPostExecute.WhenWorkItemCanceled))
                     {
                         result = true;
                     }
@@ -338,7 +327,8 @@ namespace Report.SmartThreadPool
                 }
             }
             catch // Suppress exceptions
-            { }
+            {
+            }
         }
 
         internal void FireWorkItemStarted()
@@ -351,7 +341,8 @@ namespace Report.SmartThreadPool
                 }
             }
             catch // Suppress exceptions
-            { }
+            {
+            }
         }
 
         /// <summary>
@@ -359,12 +350,12 @@ namespace Report.SmartThreadPool
         /// </summary>
         private void ExecuteWorkItem()
         {
-
 #if (NETFRAMEWORK)
             CallerThreadContext ctc = null;
             if (null != _callerContext)
             {
-                ctc = CallerThreadContext.Capture(_callerContext.CapturedCallContext, _callerContext.CapturedHttpContext);
+                ctc = CallerThreadContext.Capture(_callerContext.CapturedCallContext,
+                    _callerContext.CapturedHttpContext);
                 CallerThreadContext.Apply(_callerContext);
             }
 #endif
@@ -539,6 +530,7 @@ namespace Report.SmartThreadPool
                     }
                 }
             }
+
             // Release the wait handles
             ReleaseWaitHandles(waitableResults);
 
@@ -718,7 +710,8 @@ namespace Report.SmartThreadPool
                         //Debug.WriteLine("Work item already canceled");
                         if (abortExecution)
                         {
-                            Thread executionThread = Interlocked.CompareExchange(ref _executingThread, null, _executingThread);
+                            Thread executionThread =
+                                Interlocked.CompareExchange(ref _executingThread, null, _executingThread);
                             if (null != executionThread)
                             {
                                 executionThread.Abort(); // "Cancel"
@@ -726,7 +719,8 @@ namespace Report.SmartThreadPool
                                 // so it already signaled its completion.
                                 //signalComplete = true;
                             }
-                        } 
+                        }
+
                         success = true;
                         break;
                     case WorkItemState.Completed:
@@ -735,7 +729,8 @@ namespace Report.SmartThreadPool
                     case WorkItemState.InProgress:
                         if (abortExecution)
                         {
-                            Thread executionThread = Interlocked.CompareExchange(ref _executingThread, null, _executingThread);
+                            Thread executionThread =
+                                Interlocked.CompareExchange(ref _executingThread, null, _executingThread);
                             if (null != executionThread)
                             {
                                 executionThread.Abort(); // "Cancel"
@@ -748,6 +743,7 @@ namespace Report.SmartThreadPool
                             success = true;
                             signalComplete = true;
                         }
+
                         break;
                     case WorkItemState.InQueue:
                         // Signal to the wait for completion that the work
@@ -764,6 +760,7 @@ namespace Report.SmartThreadPool
                     SignalComplete(true);
                 }
             }
+
             return success;
         }
 
@@ -782,8 +779,10 @@ namespace Report.SmartThreadPool
             object result = GetResult(millisecondsTimeout, exitContext, cancelWaitHandle, out e);
             if (null != e)
             {
-                throw new WorkItemResultException("The work item caused an excpetion, see the inner exception for details", e);
+                throw new WorkItemResultException(
+                    "The work item caused an excpetion, see the inner exception for details", e);
             }
+
             return result;
         }
 
@@ -847,7 +846,6 @@ namespace Report.SmartThreadPool
                     default:
                         Debug.Assert(false);
                         break;
-
                 }
             }
 
@@ -876,8 +874,10 @@ namespace Report.SmartThreadPool
                 {
                     _workItemCompleted = EventWaitHandleFactory.CreateManualResetEvent(IsCompleted);
                 }
+
                 ++_workItemCompletedRefCount;
             }
+
             return _workItemCompleted;
         }
 
@@ -936,36 +936,21 @@ namespace Report.SmartThreadPool
         /// </summary>
         public WorkItemPriority WorkItemPriority
         {
-            get
-            {
-                return _workItemInfo.WorkItemPriority;
-            }
+            get { return _workItemInfo.WorkItemPriority; }
         }
 
         #endregion
 
         internal event WorkItemStateCallback OnWorkItemStarted
         {
-            add
-            {
-                _workItemStartedEvent += value;
-            }
-            remove
-            {
-                _workItemStartedEvent -= value;
-            }
+            add { _workItemStartedEvent += value; }
+            remove { _workItemStartedEvent -= value; }
         }
 
         internal event WorkItemStateCallback OnWorkItemCompleted
         {
-            add
-            {
-                _workItemCompletedEvent += value;
-            }
-            remove
-            {
-                _workItemCompletedEvent -= value;
-            }
+            add { _workItemCompletedEvent += value; }
+            remove { _workItemCompletedEvent -= value; }
         }
 
         public void DisposeOfState()

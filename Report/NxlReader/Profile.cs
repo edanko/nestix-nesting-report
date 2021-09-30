@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Xml.Linq;
 
-namespace NxlReader
+namespace Report.NxlReader
 {
     public class Profile : IElement
     {

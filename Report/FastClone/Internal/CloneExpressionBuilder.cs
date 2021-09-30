@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.Serialization;
 
-namespace NxlReader.FastClone.Internal
+namespace Report.FastClone.Internal
 {
     internal class CloneExpressionBuilder
     {

@@ -1,5 +1,4 @@
-﻿
-namespace Report.SmartThreadPool
+﻿namespace Report.SmartThreadPool
 {
     /// <summary>
     /// An internal delegate to call when the WorkItem starts or completes

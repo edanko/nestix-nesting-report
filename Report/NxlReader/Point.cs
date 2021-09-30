@@ -1,4 +1,4 @@
-﻿namespace NxlReader
+﻿namespace Report.NxlReader
 {
     public class Point
     {

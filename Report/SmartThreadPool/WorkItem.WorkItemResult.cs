@@ -28,18 +28,12 @@ namespace Report.SmartThreadPool
 
             public bool IsCompleted
             {
-                get
-                {
-                    return _workItem.IsCompleted;
-                }
+                get { return _workItem.IsCompleted; }
             }
 
             public bool IsCanceled
             {
-                get
-                {
-                    return _workItem.IsCanceled;
-                }
+                get { return _workItem.IsCanceled; }
             }
 
             public object GetResult()
@@ -82,7 +76,8 @@ namespace Report.SmartThreadPool
                 return _workItem.GetResult((int)timeout.TotalMilliseconds, exitContext, null, out e);
             }
 
-            public object GetResult(int millisecondsTimeout, bool exitContext, WaitHandle cancelWaitHandle, out Exception e)
+            public object GetResult(int millisecondsTimeout, bool exitContext, WaitHandle cancelWaitHandle,
+                out Exception e)
             {
                 return _workItem.GetResult(millisecondsTimeout, exitContext, cancelWaitHandle, out e);
             }
@@ -104,18 +99,12 @@ namespace Report.SmartThreadPool
 
             public object State
             {
-                get
-                {
-                    return _workItem._state;
-                }
+                get { return _workItem._state; }
             }
 
             public WorkItemPriority WorkItemPriority
             {
-                get
-                {
-                    return _workItem._workItemInfo.WorkItemPriority;
-                }
+                get { return _workItem._workItemInfo.WorkItemPriority; }
             }
 
             /// <summary>
@@ -142,27 +131,15 @@ namespace Report.SmartThreadPool
 
             public event WorkItemStateCallback OnWorkItemStarted
             {
-                add
-                {
-                    _workItem.OnWorkItemStarted += value;
-                }
-                remove
-                {
-                    _workItem.OnWorkItemStarted -= value;
-                }
+                add { _workItem.OnWorkItemStarted += value; }
+                remove { _workItem.OnWorkItemStarted -= value; }
             }
 
 
             public event WorkItemStateCallback OnWorkItemCompleted
             {
-                add
-                {
-                    _workItem.OnWorkItemCompleted += value;
-                }
-                remove
-                {
-                    _workItem.OnWorkItemCompleted -= value;
-                }
+                add { _workItem.OnWorkItemCompleted += value; }
+                remove { _workItem.OnWorkItemCompleted -= value; }
             }
 
             #endregion
@@ -183,6 +160,5 @@ namespace Report.SmartThreadPool
         }
 
         #endregion
-
     }
 }

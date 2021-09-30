@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace NxlReader
+namespace Report.NxlReader
 {
     public class Part
     {

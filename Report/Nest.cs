@@ -29,6 +29,4 @@ namespace Report
             return Parts.Sum(x => x.Weight);
         }
     }
-
-
 }

@@ -78,6 +78,7 @@ namespace Report.SmartThreadPool
                 }
             }
         }
+
         public void Clear()
         {
             lock (_lock)

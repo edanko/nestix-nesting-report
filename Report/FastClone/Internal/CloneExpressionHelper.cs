@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace NxlReader.FastClone.Internal
+namespace Report.FastClone.Internal
 {
     internal static class CloneExpressionHelper
     {

@@ -56,7 +56,8 @@ namespace Report.SmartThreadPool
             return (TResult)_workItemResult.GetResult(timeout, exitContext, out e);
         }
 
-        public TResult GetResult(int millisecondsTimeout, bool exitContext, WaitHandle cancelWaitHandle, out Exception e)
+        public TResult GetResult(int millisecondsTimeout, bool exitContext, WaitHandle cancelWaitHandle,
+            out Exception e)
         {
             return (TResult)_workItemResult.GetResult(millisecondsTimeout, exitContext, cancelWaitHandle, out e);
         }
@@ -124,5 +125,4 @@ namespace Report.SmartThreadPool
     }
 
     #endregion
-
 }

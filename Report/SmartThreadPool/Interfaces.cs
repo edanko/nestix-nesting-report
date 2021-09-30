@@ -3,18 +3,18 @@ using System.Threading;
 
 namespace Report.SmartThreadPool
 {
-	#region Delegates
+    #region Delegates
 
-	/// <summary>
-	/// A delegate that represents the method to run as the work item
-	/// </summary>
-	/// <param name="state">A state object for the method to run</param>
-	public delegate object WorkItemCallback(object state);
+    /// <summary>
+    /// A delegate that represents the method to run as the work item
+    /// </summary>
+    /// <param name="state">A state object for the method to run</param>
+    public delegate object WorkItemCallback(object state);
 
-	/// <summary>
-	/// A delegate to call after the WorkItemCallback completed
-	/// </summary>
-	/// <param name="wir">The work item result object</param>
+    /// <summary>
+    /// A delegate to call after the WorkItemCallback completed
+    /// </summary>
+    /// <param name="wir">The work item result object</param>
     public delegate void PostExecuteWorkItemCallback(IWorkItemResult wir);
 
     /// <summary>
@@ -23,11 +23,11 @@ namespace Report.SmartThreadPool
     /// <param name="wir">The work item result object</param>
     public delegate void PostExecuteWorkItemCallback<TResult>(IWorkItemResult<TResult> wir);
 
-	/// <summary>
-	/// A delegate to call when a WorkItemsGroup becomes idle
-	/// </summary>
-	/// <param name="workItemsGroup">A reference to the WorkItemsGroup that became idle</param>
-	public delegate void WorkItemsGroupIdleHandler(IWorkItemsGroup workItemsGroup);
+    /// <summary>
+    /// A delegate to call when a WorkItemsGroup becomes idle
+    /// </summary>
+    /// <param name="workItemsGroup">A reference to the WorkItemsGroup that became idle</param>
+    public delegate void WorkItemsGroupIdleHandler(IWorkItemsGroup workItemsGroup);
 
     /// <summary>
     /// A delegate to call after a thread is created, but before 
@@ -41,38 +41,38 @@ namespace Report.SmartThreadPool
     /// </summary>
     public delegate void ThreadTerminationHandler();
 
-	#endregion
+    #endregion
 
-	#region WorkItem Priority
+    #region WorkItem Priority
 
     /// <summary>
     /// Defines the availeable priorities of a work item.
     /// The higher the priority a work item has, the sooner
     /// it will be executed.
     /// </summary>
-	public enum WorkItemPriority
-	{
-		Lowest,
-		BelowNormal,
-		Normal,
-		AboveNormal,
-		Highest,
-	}
+    public enum WorkItemPriority
+    {
+        Lowest,
+        BelowNormal,
+        Normal,
+        AboveNormal,
+        Highest,
+    }
 
-	#endregion
+    #endregion
 
-	#region IWorkItemsGroup interface 
+    #region IWorkItemsGroup interface
 
-	/// <summary>
-	/// IWorkItemsGroup interface
+    /// <summary>
+    /// IWorkItemsGroup interface
     /// Created by SmartThreadPool.CreateWorkItemsGroup()
-	/// </summary>
-	public interface IWorkItemsGroup
-	{
-		/// <summary>
-		/// Get/Set the name of the WorkItemsGroup
-		/// </summary>
-		string Name { get; set; }
+    /// </summary>
+    public interface IWorkItemsGroup
+    {
+        /// <summary>
+        /// Get/Set the name of the WorkItemsGroup
+        /// </summary>
+        string Name { get; set; }
 
         /// <summary>
         /// Get/Set the maximum number of workitem that execute cocurrency on the thread pool
@@ -120,14 +120,14 @@ namespace Report.SmartThreadPool
         /// <summary>
         /// Wait for all work item to complete.
         /// </summary>
-		void WaitForIdle();
+        void WaitForIdle();
 
         /// <summary>
         /// Wait for all work item to complete, until timeout expired
         /// </summary>
         /// <param name="timeout">How long to wait for the work items to complete</param>
         /// <returns>Returns true if work items completed within the timeout, otherwise false.</returns>
-		bool WaitForIdle(TimeSpan timeout);
+        bool WaitForIdle(TimeSpan timeout);
 
         /// <summary>
         /// Wait for all work item to complete, until timeout expired
@@ -198,7 +198,8 @@ namespace Report.SmartThreadPool
         /// A delegate to call after the callback completion
         /// </param>
         /// <returns>Returns a work item result</returns>
-        IWorkItemResult QueueWorkItem(WorkItemCallback callback, object state, PostExecuteWorkItemCallback postExecuteWorkItemCallback);
+        IWorkItemResult QueueWorkItem(WorkItemCallback callback, object state,
+            PostExecuteWorkItemCallback postExecuteWorkItemCallback);
 
         /// <summary>
         /// Queue a work item
@@ -212,7 +213,8 @@ namespace Report.SmartThreadPool
         /// </param>
         /// <param name="workItemPriority">The work item priority</param>
         /// <returns>Returns a work item result</returns>
-        IWorkItemResult QueueWorkItem(WorkItemCallback callback, object state, PostExecuteWorkItemCallback postExecuteWorkItemCallback, WorkItemPriority workItemPriority);
+        IWorkItemResult QueueWorkItem(WorkItemCallback callback, object state,
+            PostExecuteWorkItemCallback postExecuteWorkItemCallback, WorkItemPriority workItemPriority);
 
         /// <summary>
         /// Queue a work item
@@ -226,7 +228,8 @@ namespace Report.SmartThreadPool
         /// </param>
         /// <param name="callToPostExecute">Indicates on which cases to call to the post execute callback</param>
         /// <returns>Returns a work item result</returns>
-        IWorkItemResult QueueWorkItem(WorkItemCallback callback, object state, PostExecuteWorkItemCallback postExecuteWorkItemCallback, CallToPostExecute callToPostExecute);
+        IWorkItemResult QueueWorkItem(WorkItemCallback callback, object state,
+            PostExecuteWorkItemCallback postExecuteWorkItemCallback, CallToPostExecute callToPostExecute);
 
         /// <summary>
         /// Queue a work item
@@ -241,7 +244,9 @@ namespace Report.SmartThreadPool
         /// <param name="callToPostExecute">Indicates on which cases to call to the post execute callback</param>
         /// <param name="workItemPriority">The work item priority</param>
         /// <returns>Returns a work item result</returns>
-        IWorkItemResult QueueWorkItem(WorkItemCallback callback, object state, PostExecuteWorkItemCallback postExecuteWorkItemCallback, CallToPostExecute callToPostExecute, WorkItemPriority workItemPriority);
+        IWorkItemResult QueueWorkItem(WorkItemCallback callback, object state,
+            PostExecuteWorkItemCallback postExecuteWorkItemCallback, CallToPostExecute callToPostExecute,
+            WorkItemPriority workItemPriority);
 
         /// <summary>
         /// Queue a work item
@@ -270,31 +275,36 @@ namespace Report.SmartThreadPool
         /// Queue a work item.
         /// </summary>
         /// <returns>Returns a IWorkItemResult object, but its GetResult() will always return null</returns>
-        IWorkItemResult QueueWorkItem(Action action, WorkItemPriority priority = SmartThreadPool.DefaultWorkItemPriority);
+        IWorkItemResult QueueWorkItem(Action action,
+            WorkItemPriority priority = SmartThreadPool.DefaultWorkItemPriority);
 
         /// <summary>
         /// Queue a work item.
         /// </summary>
         /// <returns>Returns a IWorkItemResult object, but its GetResult() will always return null</returns>
-        IWorkItemResult QueueWorkItem<T>(Action<T> action, T arg, WorkItemPriority priority = SmartThreadPool.DefaultWorkItemPriority);
+        IWorkItemResult QueueWorkItem<T>(Action<T> action, T arg,
+            WorkItemPriority priority = SmartThreadPool.DefaultWorkItemPriority);
 
         /// <summary>
         /// Queue a work item.
         /// </summary>
         /// <returns>Returns a IWorkItemResult object, but its GetResult() will always return null</returns>
-        IWorkItemResult QueueWorkItem<T1, T2>(Action<T1, T2> action, T1 arg1, T2 arg2, WorkItemPriority priority = SmartThreadPool.DefaultWorkItemPriority);
+        IWorkItemResult QueueWorkItem<T1, T2>(Action<T1, T2> action, T1 arg1, T2 arg2,
+            WorkItemPriority priority = SmartThreadPool.DefaultWorkItemPriority);
 
         /// <summary>
         /// Queue a work item.
         /// </summary>
         /// <returns>Returns a IWorkItemResult object, but its GetResult() will always return null</returns>
-        IWorkItemResult QueueWorkItem<T1, T2, T3>(Action<T1, T2, T3> action, T1 arg1, T2 arg2, T3 arg3, WorkItemPriority priority = SmartThreadPool.DefaultWorkItemPriority);
+        IWorkItemResult QueueWorkItem<T1, T2, T3>(Action<T1, T2, T3> action, T1 arg1, T2 arg2, T3 arg3,
+            WorkItemPriority priority = SmartThreadPool.DefaultWorkItemPriority);
 
         /// <summary>
         /// Queue a work item.
         /// </summary>
         /// <returns>Returns a IWorkItemResult object, but its GetResult() will always return null</returns>
-        IWorkItemResult QueueWorkItem<T1, T2, T3, T4>(Action<T1, T2, T3, T4> action, T1 arg1, T2 arg2, T3 arg3, T4 arg4, WorkItemPriority priority = SmartThreadPool.DefaultWorkItemPriority);
+        IWorkItemResult QueueWorkItem<T1, T2, T3, T4>(Action<T1, T2, T3, T4> action, T1 arg1, T2 arg2, T3 arg3, T4 arg4,
+            WorkItemPriority priority = SmartThreadPool.DefaultWorkItemPriority);
 
         #endregion
 
@@ -305,70 +315,75 @@ namespace Report.SmartThreadPool
         /// </summary>
         /// <returns>Returns a IWorkItemResult&lt;TResult&gt; object. 
         /// its GetResult() returns a TResult object</returns>
-        IWorkItemResult<TResult> QueueWorkItem<TResult>(Func<TResult> func, WorkItemPriority priority = SmartThreadPool.DefaultWorkItemPriority);
+        IWorkItemResult<TResult> QueueWorkItem<TResult>(Func<TResult> func,
+            WorkItemPriority priority = SmartThreadPool.DefaultWorkItemPriority);
 
         /// <summary>
         /// Queue a work item.
         /// </summary>
         /// <returns>Returns a IWorkItemResult&lt;TResult&gt; object. 
         /// its GetResult() returns a TResult object</returns>
-        IWorkItemResult<TResult> QueueWorkItem<T, TResult>(Func<T, TResult> func, T arg, WorkItemPriority priority = SmartThreadPool.DefaultWorkItemPriority);
+        IWorkItemResult<TResult> QueueWorkItem<T, TResult>(Func<T, TResult> func, T arg,
+            WorkItemPriority priority = SmartThreadPool.DefaultWorkItemPriority);
 
         /// <summary>
         /// Queue a work item.
         /// </summary>
         /// <returns>Returns a IWorkItemResult&lt;TResult&gt; object. 
         /// its GetResult() returns a TResult object</returns>
-        IWorkItemResult<TResult> QueueWorkItem<T1, T2, TResult>(Func<T1, T2, TResult> func, T1 arg1, T2 arg2, WorkItemPriority priority = SmartThreadPool.DefaultWorkItemPriority);
+        IWorkItemResult<TResult> QueueWorkItem<T1, T2, TResult>(Func<T1, T2, TResult> func, T1 arg1, T2 arg2,
+            WorkItemPriority priority = SmartThreadPool.DefaultWorkItemPriority);
 
         /// <summary>
         /// Queue a work item.
         /// </summary>
         /// <returns>Returns a IWorkItemResult&lt;TResult&gt; object. 
         /// its GetResult() returns a TResult object</returns>
-        IWorkItemResult<TResult> QueueWorkItem<T1, T2, T3, TResult>(Func<T1, T2, T3, TResult> func, T1 arg1, T2 arg2, T3 arg3, WorkItemPriority priority = SmartThreadPool.DefaultWorkItemPriority);
+        IWorkItemResult<TResult> QueueWorkItem<T1, T2, T3, TResult>(Func<T1, T2, T3, TResult> func, T1 arg1, T2 arg2,
+            T3 arg3, WorkItemPriority priority = SmartThreadPool.DefaultWorkItemPriority);
 
         /// <summary>
         /// Queue a work item.
         /// </summary>
         /// <returns>Returns a IWorkItemResult&lt;TResult&gt; object. 
         /// its GetResult() returns a TResult object</returns>
-        IWorkItemResult<TResult> QueueWorkItem<T1, T2, T3, T4, TResult>(Func<T1, T2, T3, T4, TResult> func, T1 arg1, T2 arg2, T3 arg3, T4 arg4, WorkItemPriority priority = SmartThreadPool.DefaultWorkItemPriority);
+        IWorkItemResult<TResult> QueueWorkItem<T1, T2, T3, T4, TResult>(Func<T1, T2, T3, T4, TResult> func, T1 arg1,
+            T2 arg2, T3 arg3, T4 arg4, WorkItemPriority priority = SmartThreadPool.DefaultWorkItemPriority);
 
         #endregion
     }
 
-	#endregion
+    #endregion
 
-	#region CallToPostExecute enumerator
+    #region CallToPostExecute enumerator
 
-	[Flags]
-	public enum CallToPostExecute
-	{
+    [Flags]
+    public enum CallToPostExecute
+    {
         /// <summary>
         /// Never call to the PostExecute call back
         /// </summary>
-		Never                    = 0x00,
+        Never = 0x00,
 
         /// <summary>
         /// Call to the PostExecute only when the work item is cancelled
         /// </summary>
-		WhenWorkItemCanceled     = 0x01,
+        WhenWorkItemCanceled = 0x01,
 
         /// <summary>
         /// Call to the PostExecute only when the work item is not cancelled
         /// </summary>
-		WhenWorkItemNotCanceled  = 0x02,
+        WhenWorkItemNotCanceled = 0x02,
 
         /// <summary>
         /// Always call to the PostExecute
         /// </summary>
-		Always                   = WhenWorkItemCanceled | WhenWorkItemNotCanceled,
-	}
+        Always = WhenWorkItemCanceled | WhenWorkItemNotCanceled,
+    }
 
-	#endregion
+    #endregion
 
-	#region IWorkItemResult interface
+    #region IWorkItemResult interface
 
     /// <summary>
     /// The common interface of IWorkItemResult and IWorkItemResult&lt;T&gt;
@@ -396,159 +411,159 @@ namespace Report.SmartThreadPool
     {
     }
 
-	/// <summary>
+    /// <summary>
     /// IWorkItemResult&lt;TResult&gt; interface.
     /// Created when a Func&lt;TResult&gt; work item is queued.
-	/// </summary>
+    /// </summary>
     public interface IWorkItemResult<TResult> : IWaitableResult
-	{
-		/// <summary>
-		/// Get the result of the work item.
-		/// If the work item didn't run yet then the caller waits.
-		/// </summary>
-		/// <returns>The result of the work item</returns>
+    {
+        /// <summary>
+        /// Get the result of the work item.
+        /// If the work item didn't run yet then the caller waits.
+        /// </summary>
+        /// <returns>The result of the work item</returns>
         TResult GetResult();
 
-		/// <summary>
-		/// Get the result of the work item.
-		/// If the work item didn't run yet then the caller waits until timeout.
-		/// </summary>
-		/// <returns>The result of the work item</returns>
-		/// On timeout throws WorkItemTimeoutException
+        /// <summary>
+        /// Get the result of the work item.
+        /// If the work item didn't run yet then the caller waits until timeout.
+        /// </summary>
+        /// <returns>The result of the work item</returns>
+        /// On timeout throws WorkItemTimeoutException
         TResult GetResult(
-			int millisecondsTimeout,
-			bool exitContext);
+            int millisecondsTimeout,
+            bool exitContext);
 
-		/// <summary>
-		/// Get the result of the work item.
-		/// If the work item didn't run yet then the caller waits until timeout.
-		/// </summary>
-		/// <returns>The result of the work item</returns>
-		/// On timeout throws WorkItemTimeoutException
-        TResult GetResult(			
-			TimeSpan timeout,
-			bool exitContext);
+        /// <summary>
+        /// Get the result of the work item.
+        /// If the work item didn't run yet then the caller waits until timeout.
+        /// </summary>
+        /// <returns>The result of the work item</returns>
+        /// On timeout throws WorkItemTimeoutException
+        TResult GetResult(
+            TimeSpan timeout,
+            bool exitContext);
 
-		/// <summary>
-		/// Get the result of the work item.
-		/// If the work item didn't run yet then the caller waits until timeout or until the cancelWaitHandle is signaled.
-		/// </summary>
-		/// <param name="millisecondsTimeout">Timeout in milliseconds, or -1 for infinite</param>
-		/// <param name="exitContext">
-		/// true to exit the synchronization domain for the context before the wait (if in a synchronized context), and reacquire it; otherwise, false. 
-		/// </param>
-		/// <param name="cancelWaitHandle">A cancel wait handle to interrupt the blocking if needed</param>
-		/// <returns>The result of the work item</returns>
-		/// On timeout throws WorkItemTimeoutException
-		/// On cancel throws WorkItemCancelException
-        TResult GetResult(			
-			int millisecondsTimeout,
-			bool exitContext,
-			WaitHandle cancelWaitHandle);
+        /// <summary>
+        /// Get the result of the work item.
+        /// If the work item didn't run yet then the caller waits until timeout or until the cancelWaitHandle is signaled.
+        /// </summary>
+        /// <param name="millisecondsTimeout">Timeout in milliseconds, or -1 for infinite</param>
+        /// <param name="exitContext">
+        /// true to exit the synchronization domain for the context before the wait (if in a synchronized context), and reacquire it; otherwise, false. 
+        /// </param>
+        /// <param name="cancelWaitHandle">A cancel wait handle to interrupt the blocking if needed</param>
+        /// <returns>The result of the work item</returns>
+        /// On timeout throws WorkItemTimeoutException
+        /// On cancel throws WorkItemCancelException
+        TResult GetResult(
+            int millisecondsTimeout,
+            bool exitContext,
+            WaitHandle cancelWaitHandle);
 
-		/// <summary>
-		/// Get the result of the work item.
-		/// If the work item didn't run yet then the caller waits until timeout or until the cancelWaitHandle is signaled.
-		/// </summary>
-		/// <returns>The result of the work item</returns>
-		/// On timeout throws WorkItemTimeoutException
-		/// On cancel throws WorkItemCancelException
-        TResult GetResult(			
-			TimeSpan timeout,
-			bool exitContext,
-			WaitHandle cancelWaitHandle);
+        /// <summary>
+        /// Get the result of the work item.
+        /// If the work item didn't run yet then the caller waits until timeout or until the cancelWaitHandle is signaled.
+        /// </summary>
+        /// <returns>The result of the work item</returns>
+        /// On timeout throws WorkItemTimeoutException
+        /// On cancel throws WorkItemCancelException
+        TResult GetResult(
+            TimeSpan timeout,
+            bool exitContext,
+            WaitHandle cancelWaitHandle);
 
-		/// <summary>
-		/// Get the result of the work item.
-		/// If the work item didn't run yet then the caller waits.
-		/// </summary>
-		/// <param name="e">Filled with the exception if one was thrown</param>
-		/// <returns>The result of the work item</returns>
+        /// <summary>
+        /// Get the result of the work item.
+        /// If the work item didn't run yet then the caller waits.
+        /// </summary>
+        /// <param name="e">Filled with the exception if one was thrown</param>
+        /// <returns>The result of the work item</returns>
         TResult GetResult(out Exception e);
 
-		/// <summary>
-		/// Get the result of the work item.
-		/// If the work item didn't run yet then the caller waits until timeout.
-		/// </summary>
-		/// <param name="millisecondsTimeout"></param>
-		/// <param name="exitContext"></param>
-		/// <param name="e">Filled with the exception if one was thrown</param>
-		/// <returns>The result of the work item</returns>
-		/// On timeout throws WorkItemTimeoutException
+        /// <summary>
+        /// Get the result of the work item.
+        /// If the work item didn't run yet then the caller waits until timeout.
+        /// </summary>
+        /// <param name="millisecondsTimeout"></param>
+        /// <param name="exitContext"></param>
+        /// <param name="e">Filled with the exception if one was thrown</param>
+        /// <returns>The result of the work item</returns>
+        /// On timeout throws WorkItemTimeoutException
         TResult GetResult(
-			int millisecondsTimeout,
-			bool exitContext,
-			out Exception e);
+            int millisecondsTimeout,
+            bool exitContext,
+            out Exception e);
 
-		/// <summary>
-		/// Get the result of the work item.
-		/// If the work item didn't run yet then the caller waits until timeout.
-		/// </summary>
-		/// <param name="exitContext"></param>
-		/// <param name="e">Filled with the exception if one was thrown</param>
-		/// <param name="timeout"></param>
-		/// <returns>The result of the work item</returns>
-		/// On timeout throws WorkItemTimeoutException
-        TResult GetResult(			
-			TimeSpan timeout,
-			bool exitContext,
-			out Exception e);
+        /// <summary>
+        /// Get the result of the work item.
+        /// If the work item didn't run yet then the caller waits until timeout.
+        /// </summary>
+        /// <param name="exitContext"></param>
+        /// <param name="e">Filled with the exception if one was thrown</param>
+        /// <param name="timeout"></param>
+        /// <returns>The result of the work item</returns>
+        /// On timeout throws WorkItemTimeoutException
+        TResult GetResult(
+            TimeSpan timeout,
+            bool exitContext,
+            out Exception e);
 
-		/// <summary>
-		/// Get the result of the work item.
-		/// If the work item didn't run yet then the caller waits until timeout or until the cancelWaitHandle is signaled.
-		/// </summary>
-		/// <param name="millisecondsTimeout">Timeout in milliseconds, or -1 for infinite</param>
-		/// <param name="exitContext">
-		/// true to exit the synchronization domain for the context before the wait (if in a synchronized context), and reacquire it; otherwise, false. 
-		/// </param>
-		/// <param name="cancelWaitHandle">A cancel wait handle to interrupt the blocking if needed</param>
-		/// <param name="e">Filled with the exception if one was thrown</param>
-		/// <returns>The result of the work item</returns>
-		/// On timeout throws WorkItemTimeoutException
-		/// On cancel throws WorkItemCancelException
-        TResult GetResult(			
-			int millisecondsTimeout,
-			bool exitContext,
-			WaitHandle cancelWaitHandle,
-			out Exception e);
+        /// <summary>
+        /// Get the result of the work item.
+        /// If the work item didn't run yet then the caller waits until timeout or until the cancelWaitHandle is signaled.
+        /// </summary>
+        /// <param name="millisecondsTimeout">Timeout in milliseconds, or -1 for infinite</param>
+        /// <param name="exitContext">
+        /// true to exit the synchronization domain for the context before the wait (if in a synchronized context), and reacquire it; otherwise, false. 
+        /// </param>
+        /// <param name="cancelWaitHandle">A cancel wait handle to interrupt the blocking if needed</param>
+        /// <param name="e">Filled with the exception if one was thrown</param>
+        /// <returns>The result of the work item</returns>
+        /// On timeout throws WorkItemTimeoutException
+        /// On cancel throws WorkItemCancelException
+        TResult GetResult(
+            int millisecondsTimeout,
+            bool exitContext,
+            WaitHandle cancelWaitHandle,
+            out Exception e);
 
-		/// <summary>
-		/// Get the result of the work item.
-		/// If the work item didn't run yet then the caller waits until timeout or until the cancelWaitHandle is signaled.
-		/// </summary>
-		/// <returns>The result of the work item</returns>
-		/// <param name="cancelWaitHandle"></param>
-		/// <param name="e">Filled with the exception if one was thrown</param>
-		/// <param name="timeout"></param>
-		/// <param name="exitContext"></param>
-		/// On timeout throws WorkItemTimeoutException
-		/// On cancel throws WorkItemCancelException
-        TResult GetResult(			
-			TimeSpan timeout,
-			bool exitContext,
-			WaitHandle cancelWaitHandle,
-			out Exception e);
+        /// <summary>
+        /// Get the result of the work item.
+        /// If the work item didn't run yet then the caller waits until timeout or until the cancelWaitHandle is signaled.
+        /// </summary>
+        /// <returns>The result of the work item</returns>
+        /// <param name="cancelWaitHandle"></param>
+        /// <param name="e">Filled with the exception if one was thrown</param>
+        /// <param name="timeout"></param>
+        /// <param name="exitContext"></param>
+        /// On timeout throws WorkItemTimeoutException
+        /// On cancel throws WorkItemCancelException
+        TResult GetResult(
+            TimeSpan timeout,
+            bool exitContext,
+            WaitHandle cancelWaitHandle,
+            out Exception e);
 
-		/// <summary>
-		/// Gets an indication whether the asynchronous operation has completed.
-		/// </summary>
-		bool IsCompleted { get; }
+        /// <summary>
+        /// Gets an indication whether the asynchronous operation has completed.
+        /// </summary>
+        bool IsCompleted { get; }
 
-		/// <summary>
-		/// Gets an indication whether the asynchronous operation has been canceled.
-		/// </summary>
-		bool IsCanceled { get; }
+        /// <summary>
+        /// Gets an indication whether the asynchronous operation has been canceled.
+        /// </summary>
+        bool IsCanceled { get; }
 
-		/// <summary>
-		/// Gets the user-defined object that contains context data 
+        /// <summary>
+        /// Gets the user-defined object that contains context data 
         /// for the work item method.
-		/// </summary>
-		object State { get; }
+        /// </summary>
+        object State { get; }
 
-		/// <summary>
+        /// <summary>
         /// Same as Cancel(false).
-		/// </summary>
+        /// </summary>
         bool Cancel();
 
         /// <summary>
@@ -565,21 +580,21 @@ namespace Report.SmartThreadPool
         /// <returns>Returns true if the work item was not completed, otherwise false.</returns>
         bool Cancel(bool abortExecution);
 
-		/// <summary>
-		/// Get the work item's priority
-		/// </summary>
-		WorkItemPriority WorkItemPriority { get; }
+        /// <summary>
+        /// Get the work item's priority
+        /// </summary>
+        WorkItemPriority WorkItemPriority { get; }
 
-		/// <summary>
-		/// Return the result, same as GetResult()
-		/// </summary>
+        /// <summary>
+        /// Return the result, same as GetResult()
+        /// </summary>
         TResult Result { get; }
 
-		/// <summary>
-		/// Returns the exception if occured otherwise returns null.
-		/// </summary>
-		object Exception { get; }
-	}
+        /// <summary>
+        /// Returns the exception if occured otherwise returns null.
+        /// </summary>
+        object Exception { get; }
+    }
 
-	#endregion
+    #endregion
 }

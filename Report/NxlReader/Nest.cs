@@ -6,7 +6,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Xml.Linq;
 
-namespace NxlReader
+namespace Report.NxlReader
 {
     public class Nest
     {
@@ -319,8 +319,10 @@ namespace NxlReader
 
         public Rectangle GetBBox()
         {
-            double maxHeight = double.MinValue, maxWidth = double.MinValue, minHeight = double.MaxValue, minWidth = double.MaxValue;
-
+            double maxHeight = double.MinValue,
+                maxWidth = double.MinValue,
+                minHeight = double.MaxValue,
+                minWidth = double.MaxValue;
 
             foreach (var g in Plate.Profiles.SelectMany(p => p.Geometry))
             {
@@ -521,8 +523,8 @@ namespace NxlReader
             var y = (int)Math.Ceiling(minHeight);
             var width = (int)Math.Ceiling(maxWidth - minWidth);
             var height = (int)Math.Ceiling(maxHeight - minHeight);
-            
-            return new Rectangle(x,y,width,height);
+
+            return new Rectangle(x, y, width, height);
         }
     }
 }

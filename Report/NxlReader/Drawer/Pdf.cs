@@ -5,7 +5,7 @@ using iText.Kernel.Geom;
 using iText.Kernel.Pdf.Canvas;
 using Path = System.IO.Path;
 
-namespace NxlReader.Drawer
+namespace Report.NxlReader.Drawer
 {
     public class Pdf
     {
