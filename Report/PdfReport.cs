@@ -63,7 +63,8 @@ namespace Report
         public byte[] ProcessNest(Nest d, string launch)
         {
             _fontProgram = FontProgramFactory.CreateFont(_consolas);
-            _font = PdfFontFactory.CreateFont(_fontProgram, PdfEncodings.IDENTITY_H, PdfFontFactory.EmbeddingStrategy.PREFER_NOT_EMBEDDED);
+            _font = PdfFontFactory.CreateFont(_fontProgram, PdfEncodings.IDENTITY_H,
+                PdfFontFactory.EmbeddingStrategy.PREFER_NOT_EMBEDDED);
 
             var fs = new MemoryStream();
 
@@ -542,7 +543,6 @@ namespace Report
 
             doc.Add(table);
 
-#if !USE_EMF
             var page = pdf.GetPage(1);
             var canvas = new PdfCanvas(page);
 
@@ -552,7 +552,6 @@ namespace Report
 
             var dr = new Pdf();
             dr.Draw(canvas, rect, nest);
-#endif
 
             #endregion
 
@@ -720,131 +719,5 @@ namespace Report
 
             return fs.ToArray();
         }
-
-#if USE_EMF
-        [DllImport("gdiplus.dll", SetLastError = true)]
-        private static extern int GdipEmfToWmfBits(IntPtr hEmf, int uBufferSize, byte[] bBuffer, int iMappingMode,
-            EmfToWmfBitsFlags flags);
-
-/*
-        [DllImport("gdi32.dll")]
-        private static extern IntPtr SetEnhMetaFileBits(uint cbBuffer, byte[] lpBuffer);
-*/
-        [DllImport("gdi32.dll")]
-        private static extern bool DeleteEnhMetaFile(IntPtr hEmf);
-
-        [Flags]
-        private enum EmfToWmfBitsFlags
-        {
-            EmfToWmfBitsFlagsDefault = 0x00000000,
-
-            //EmfToWmfBitsFlagsEmbedEmf = 0x00000001,
-            EmfToWmfBitsFlagsIncludePlaceable = 0x00000002,
-            //EmfToWmfBitsFlagsNoXORClip = 0x00000004
-        }
-
-        // private static byte[] GetWmfByteArray(Metafile mf) {
-        //     const int MM_ANISOTROPIC = 8;
-        //     var handle = mf.GetHenhmetafile();
-        //     var bufferSize = GdipEmfToWmfBits(handle, 0, null, MM_ANISOTROPIC, EmfToWmfBitsFlags.EmfToWmfBitsFlagsIncludePlaceable);
-        //     byte[] buf = new byte[bufferSize];
-        //     GdipEmfToWmfBits(handle, bufferSize, buf, MM_ANISOTROPIC, EmfToWmfBitsFlags.EmfToWmfBitsFlagsIncludePlaceable);
-        //     return buf;
-        // }
-
-        [StructLayout(LayoutKind.Sequential)]
-        private struct Placeablemetaheader
-        {
-            public uint Key; // Magic number (always 9AC6CDD7h)
-            public ushort Handle; // Metafile HANDLE number (always 0) /
-            public short Left; // Left coordinate in metafile units /
-            public short Top; // Top coordinate in metafile units /
-            public short Right; // Right coordinate in metafile units /
-            public short Bottom; // Bottom coordinate in metafile units /
-            public ushort Inch; // Number of metafile units per inch /
-            public uint Reserved; // Reserved (always 0) /
-            public ushort Checksum; // Checksum value for previous 10 WORDs */
-        }
-
-        private static byte[] GetMetafileRawData(Metafile metafile)
-        {
-            byte[] data;
-
-            var header = metafile.GetMetafileHeader();
-
-            const int mmAnisotropic = 8;
-
-            var handle = metafile.GetHenhmetafile();
-
-            try
-            {
-                var flag = EmfToWmfBitsFlags.EmfToWmfBitsFlagsIncludePlaceable;
-
-                var dataSize = GdipEmfToWmfBits(handle, 0, null, mmAnisotropic, flag);
-
-                if (dataSize == 0) //Not Support EmfToWmfBitsFlagsIncludePlaceable
-                {
-                    flag = EmfToWmfBitsFlags.EmfToWmfBitsFlagsDefault;
-
-                    dataSize = GdipEmfToWmfBits(handle, 0, null, mmAnisotropic, flag);
-                }
-
-                data = new byte[dataSize];
-
-                _ = GdipEmfToWmfBits(handle, dataSize, data, mmAnisotropic, flag);
-
-                if (flag == EmfToWmfBitsFlags.EmfToWmfBitsFlagsDefault) //Add PlaceableMetaHeader to Byte Array
-                {
-                    var placeableList = new List<byte>();
-
-                    var placeable = new Placeablemetaheader
-                    {
-                        Key = 0x9AC6CDD7,
-                        Left = (short)header.Bounds.Left,
-                        Top = (short)header.Bounds.Top,
-                        Right = (short)header.Bounds.Width,
-                        Bottom = (short)header.Bounds.Height,
-                        Inch = 1440,
-                        Checksum = 0
-                    };
-
-                    placeable.Checksum ^= (ushort)(placeable.Key & 0x0000FFFF);
-                    placeable.Checksum ^= (ushort)((placeable.Key & 0xFFFF0000) >> 16);
-                    placeable.Checksum ^= placeable.Handle;
-                    placeable.Checksum ^= (ushort)placeable.Left;
-                    placeable.Checksum ^= (ushort)placeable.Top;
-                    placeable.Checksum ^= (ushort)placeable.Right;
-                    placeable.Checksum ^= (ushort)placeable.Bottom;
-                    placeable.Checksum ^= placeable.Inch;
-                    placeable.Checksum ^= (ushort)(placeable.Reserved & 0x0000FFFF);
-                    placeable.Checksum ^= (ushort)((placeable.Reserved & 0xFFFF0000) >> 16);
-
-                    placeableList.AddRange(SerializeSequentialStruct(placeable));
-                    placeableList.AddRange(data);
-
-                    data = placeableList.ToArray();
-                }
-            }
-            finally
-            {
-                DeleteEnhMetaFile(handle);
-            }
-
-            return data;
-        }
-
-        private static byte[] SerializeSequentialStruct(object @struct)
-        {
-            int size = Marshal.SizeOf(@struct) - 2;
-            var arr = new byte[size];
-            var ptr = Marshal.AllocHGlobal(size);
-            Marshal.StructureToPtr(@struct, ptr, true);
-            Marshal.Copy(ptr, arr, 0, size);
-
-            Marshal.FreeHGlobal(ptr);
-
-            return arr;
-        }
-#endif
     }
 }

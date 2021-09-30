@@ -5,6 +5,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Xml.Linq;
+using Force.DeepCloner;
 
 namespace Report.NxlReader
 {
@@ -130,7 +131,7 @@ namespace Report.NxlReader
                 {
                     case "PartInfo":
                         var orderlineInfo = pi.Element("DbInfo")?.Element("ID")?.Value;
-                        var op = originalParts.Find(x => x.OrderlineInfo == orderlineInfo).DeepCopy();
+                        var op = originalParts.Find(x => x.OrderlineInfo == orderlineInfo).DeepClone();
                         if (op == null)
                         {
                             continue;

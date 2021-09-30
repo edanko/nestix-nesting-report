@@ -9,22 +9,24 @@
 		<LangVersion>latest</LangVersion>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-		<DefineConstants>$(DefineConstants)TRACE;NOT_USE_EMF</DefineConstants>
+		<DefineConstants>$(DefineConstants)TRACE</DefineConstants>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-		<DefineConstants>$(DefineConstants)TRACE;NOT_USE_EMF</DefineConstants>
+		<DefineConstants>$(DefineConstants)TRACE</DefineConstants>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-		<DefineConstants>$(DefineConstants)TRACE;NOT_USE_EMF</DefineConstants>
+		<DefineConstants>$(DefineConstants)TRACE</DefineConstants>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-		<DefineConstants>$(DefineConstants)TRACE;NOT_USE_EMF</DefineConstants>
+		<DefineConstants>$(DefineConstants)TRACE</DefineConstants>
 	</PropertyGroup>
 	<ItemGroup>
 		<ApplicationDefinition Include="App.xaml" />
 	</ItemGroup>
 	<ItemGroup>
+		<PackageReference Include="DeepCloner" Version="0.10.2" />
 		<PackageReference Include="itext7" Version="7.1.16" />
+		<PackageReference Include="SmartThreadPool.dll" Version="2.3.0" />
 		<PackageReference Include="SvgNet" Version="2.1.6" />
 	</ItemGroup>
 	<ItemGroup>

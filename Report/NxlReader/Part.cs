@@ -9,10 +9,5 @@ namespace Report.NxlReader
         public List<TextProfile> Texts { get; set; } = new();
         public TextProfile DetailId { get; set; } = new();
         public string OrderlineInfo { get; set; }
-
-        public Part DeepCopy()
-        {
-            return FastClone.Cloner.Clone(this);
-        }
     }
 }

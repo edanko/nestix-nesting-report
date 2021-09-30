@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using Amib.Threading;
 using iText.IO.Font;
 using iText.Kernel.Font;
 using iText.Kernel.Pdf;
@@ -102,7 +103,7 @@ namespace Report
                 launch = launchWindow.LaunchString;
             }
 
-            var stp = new SmartThreadPool.SmartThreadPool();
+            var stp = new SmartThreadPool();
 
             var all = new ConcurrentDictionary<string, byte[]>();
 
