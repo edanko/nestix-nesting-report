@@ -95,13 +95,9 @@ namespace Report
                 return;
             }
 
-            string launch = "зап. вручную";
-            if (mdList.Count > 1)
-            {
-                var launchWindow = new Launch();
-                launchWindow.ShowDialog();
-                launch = launchWindow.LaunchString;
-            }
+            var launchWindow = new Launch();
+            launchWindow.ShowDialog();
+            string launch = launchWindow.LaunchString;
 
             var stp = new SmartThreadPool();
 
@@ -150,12 +146,12 @@ namespace Report
                 Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), "consola.ttf");
 
             var fontProgram = FontProgramFactory.CreateFont(ttf);
-            var font = PdfFontFactory.CreateFont(fontProgram, PdfEncodings.IDENTITY_H, PdfFontFactory.EmbeddingStrategy.PREFER_NOT_EMBEDDED);
+            var font = PdfFontFactory.CreateFont(fontProgram, PdfEncodings.IDENTITY_H,
+                PdfFontFactory.EmbeddingStrategy.PREFER_NOT_EMBEDDED);
 
             var outPdfStream = new MemoryStream();
-
-            var pdfDoc = new PdfDocument(new PdfReader(new MemoryStream(mergedBytes)), new PdfWriter(outPdfStream));
-
+            var pdfDoc = new PdfDocument(new PdfReader(new MemoryStream(mergedBytes)),
+                new PdfWriter(outPdfStream, new WriterProperties().SetFullCompressionMode(true)));
             var doc = new Document(pdfDoc);
 
             for (int i = 1; i <= pdfDoc.GetNumberOfPages(); i++)
@@ -213,25 +209,25 @@ namespace Report
 
             string file;
 
-            if (string.IsNullOrWhiteSpace(launch) || launch != "зап. вручную")
+            if (all.Keys.Count == 1)
             {
-                file = $"{launch}.pdf";
+                file = all.Keys.ToArray()[0];
             }
             else
             {
-                if (all.Keys.Count > 1)
+                if (string.IsNullOrWhiteSpace(launch) || launch != "зап. вручную")
                 {
-                    var spl = all.Keys.ToArray()[0].Split('-');
-
-                    file = spl.Length == 4 ? $"{spl[1]}-{spl[2]}" : "merged";
+                    file = launch;
                 }
                 else
                 {
-                    file = all.Keys.ToArray()[0];
-                }
+                    var spl = all.Keys.ToArray()[0].Split('-');
 
-                file += ".pdf";
+                    file = spl.Length >= 4 ? $"{spl[1]}-{spl[2]}" : $"{DateTime.Now:yy.MM.dd}";
+                }
             }
+
+            file += ".pdf";
 
             var o = outPdfStream.ToArray();
 
@@ -282,7 +278,7 @@ namespace Report
                     continue;
                 }
 
-                return l.Split(new[] { ';' }, 2)[1];
+                return l.Split(new[] {';'}, 2)[1];
             }
 
             return db;

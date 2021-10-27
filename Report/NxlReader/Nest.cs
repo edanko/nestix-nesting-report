@@ -11,17 +11,19 @@ namespace Report.NxlReader
 {
     public class Nest
     {
-        public Machine Machine { get; set; }
-        public Plate Plate { get; set; }
+        public Machine Machine { get; private set; }
+        public Plate Plate { get; private set; }
         public List<Remnant> OriginalRemnants { get; set; } = new();
         public List<Part> Parts { get; set; } = new();
-        public List<Remnant> Remnants { get; set; } = new();
-        public List<DimensionLineAnnotation> DimensionLineAnnotations = new();
+
+        private List<Remnant> Remnants { get; set; } = new();
+
+        //public List<DimensionLineAnnotation> DimensionLineAnnotations = new();
         public List<TextProfile> Texts { get; set; } = new();
-        public int TextSymbolsCount { get; set; }
-        public List<Bridge> Bridges { get; set; } = new();
-        public int BridgesCount { get; set; }
-        public int RidgesCount { get; set; }
+        public int TextSymbolsCount { get; private set; }
+        private List<Bridge> Bridges { get; set; } = new();
+        public int BridgesCount { get; private set; }
+        public int RidgesCount { get; private set; }
 
         public void Read(string filename)
         {
@@ -203,14 +205,14 @@ namespace Report.NxlReader
 
             #region manipulate
 
-            for (var i = 0; i < Parts.Count; i++)
+            foreach (var p in Parts)
             {
                 //var p = Parts[i];
-                var m = Parts[i].Matrix;
+                var m = p.Matrix;
 
                 if (m.M[8] < 0.0)
                 {
-                    foreach (var g in Parts[i].Profiles.SelectMany(e => e.Geometry))
+                    foreach (var g in p.Profiles.SelectMany(e => e.Geometry))
                     {
                         if (g is Arc a)
                         {
@@ -226,10 +228,10 @@ namespace Report.NxlReader
                 //     g.Center = m.TransformPoint(g.Center);
                 // }
 
-                for (var l = 0; l < Parts[i].Texts.Count; l++)
+                foreach (var t in p.Texts)
                 {
-                    Parts[i].Texts[l].Matrix = m;
-                    Parts[i].Texts[l].ReferencePoint = m.TransformPoint(Parts[i].Texts[l].ReferencePoint);
+                    t.Matrix = m;
+                    t.ReferencePoint = m.TransformPoint(t.ReferencePoint);
                 }
             }
 
@@ -237,7 +239,7 @@ namespace Report.NxlReader
 
             #region annotations
 
-            foreach (var p in elems.Element("Annotations")?.Elements())
+            /*foreach (var p in elems.Element("Annotations")?.Elements())
             {
                 switch (p.Name.LocalName)
                 {
@@ -253,7 +255,7 @@ namespace Report.NxlReader
                              LineLeftContour = Line.Read(p.Element("LineLeftContour")),
                              LineRightContour = Line.Read(p.Element("LineRightContour"))
                          };
-                         Annotations.AnnotationLengths.Add(ann);*/
+                         Annotations.AnnotationLengths.Add(ann);* /
                         var dim = p.Element("DimensionLineAnnotation");
 
                         DimensionLineAnnotations.Add(DimensionLineAnnotation.Read(dim));
@@ -263,7 +265,7 @@ namespace Report.NxlReader
                         Console.WriteLine("unknown annotation element: {0}", p.Name.LocalName);
                         break;
                 }
-            }
+            }*/
 
             #endregion
 
@@ -520,10 +522,10 @@ namespace Report.NxlReader
                 }
             }
 
-            var x = (int)Math.Ceiling(minWidth);
-            var y = (int)Math.Ceiling(minHeight);
-            var width = (int)Math.Ceiling(maxWidth - minWidth);
-            var height = (int)Math.Ceiling(maxHeight - minHeight);
+            var x = (int) Math.Ceiling(minWidth);
+            var y = (int) Math.Ceiling(minHeight);
+            var width = (int) Math.Ceiling(maxWidth - minWidth);
+            var height = (int) Math.Ceiling(maxHeight - minHeight);
 
             return new Rectangle(x, y, width, height);
         }
