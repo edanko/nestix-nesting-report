@@ -16,14 +16,17 @@ namespace Report
             while (r.Read())
             {
                 var part = new Part();
-                part.Project = (string)r["Project"];
-                part.Section = (string)r["Section"];
-                part.DetailCode = (int)r["DetailCode"];
-                part.DetailCount = (int)r["DetailCount"];
-                part.Pos = (string)r["Pos"];
-                part.Length = (float)r["Length"];
-                part.Width = (float)r["Width"];
-                part.Weight = (float)r["Weight"];
+                part.Project = (string) r["Project"];
+                part.Section = (string) r["Section"];
+
+                int.TryParse((string) r["DetailCode"], out var code);
+
+                part.DetailCode = code;
+                part.DetailCount = (int) r["DetailCount"];
+                part.Pos = (string) r["Pos"];
+                part.Length = (float) r["Length"];
+                part.Width = (float) r["Width"];
+                part.Weight = (float) r["Weight"];
                 parts.Add(part);
             }
 
@@ -46,14 +49,14 @@ namespace Report
             {
                 var tool = new Tool
                 {
-                    DistanceM = (double)r["Distance_m"],
-                    MoveTime = (double)r["MoveTime"],
-                    Pathid = (int)r["pathid"],
+                    DistanceM = (double) r["Distance_m"],
+                    MoveTime = (double) r["MoveTime"],
+                    Pathid = (int) r["pathid"],
                     //Speed = (double)r["Speed"],
-                    StartCount = (int)r["StartCount"],
-                    StartTimeMin = (double)r["StartTime_min"],
-                    ToolName = (string)r["ToolName"],
-                    TotalTimeMin = (double)r["TotalTime_min"]
+                    StartCount = (int) r["StartCount"],
+                    StartTimeMin = (double) r["StartTime_min"],
+                    ToolName = (string) r["ToolName"],
+                    TotalTimeMin = (double) r["TotalTime_min"]
                 };
                 tools.Add(tool);
             }
@@ -73,13 +76,13 @@ namespace Report
 
             r.Read();
 
-            plate.Quality = (string)r["Quality"];
-            plate.Thickness = (float)r["Thickness"];
-            plate.UsedWeight = (float)r["UsedWeight"];
-            plate.NestGrossWeight = (double)r["NestGrossWeight"];
-            plate.MatWeight = (double)r["MatWeight"];
-            plate.Length = (float)r["Length"];
-            plate.Width = (float)r["Width"];
+            plate.Quality = (string) r["Quality"];
+            plate.Thickness = (float) r["Thickness"];
+            plate.UsedWeight = (float) r["UsedWeight"];
+            plate.NestGrossWeight = (double) r["NestGrossWeight"];
+            plate.MatWeight = (double) r["MatWeight"];
+            plate.Length = (float) r["Length"];
+            plate.Width = (float) r["Width"];
 
             r.Close();
 
@@ -96,16 +99,16 @@ namespace Report
             while (r.Read())
             {
                 var masterData = new Nest();
-                masterData.Nxpathid = (int)r["nxpathid"];
-                masterData.Nxsheetpathid = (int)r["nxsheetpathid"];
-                masterData.NcName = (string)r["NcName"];
-                masterData.Machine = (string)r["Machine"];
-                masterData.Used = (float)r["Used"];
-                masterData.Info = (string)r["Info"];
-                masterData.NxlFile = (string)r["NxlFile"];
-                masterData.EmfImage = (string)r["EmfImage"];
-                masterData.RemnantArea = (double)r["RemnantArea"];
-                masterData.RemnantWeight = (double)r["RemnantWeight"];
+                masterData.Nxpathid = (int) r["nxpathid"];
+                masterData.Nxsheetpathid = (int) r["nxsheetpathid"];
+                masterData.NcName = (string) r["NcName"];
+                masterData.Machine = (string) r["Machine"];
+                masterData.Used = (float) r["Used"];
+                masterData.Info = (string) r["Info"];
+                masterData.NxlFile = (string) r["NxlFile"];
+                masterData.EmfImage = (string) r["EmfImage"];
+                masterData.RemnantArea = (double) r["RemnantArea"];
+                masterData.RemnantWeight = (double) r["RemnantWeight"];
                 all.Add(masterData);
             }
 
@@ -146,7 +149,7 @@ WHERE nxpath.nxpathid IN ({@pathid})";
         private const string DefaultPartQuery = @"SELECT
     nxsheetpath.nxpathid,
     nxsheetpath.nxsheetpathid,
-    CAST(nxsheetpathdet.nxdetailcode AS int) AS DetailCode,
+    nxsheetpathdet.nxdetailcode AS DetailCode,
     ISNULL(nxorderline.nxororderno, '') AS Project,
     ISNULL(nxorderline.nxolsection, '') AS Section,
     ISNULL(nxproduct.nxprpartno,'') AS Pos,
