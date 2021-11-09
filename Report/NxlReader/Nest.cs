@@ -320,214 +320,39 @@ namespace Report.NxlReader
             #endregion
         }
 
-        public Rectangle GetBBox()
+        public RectangleF GetBBox()
         {
-            double maxHeight = double.MinValue,
-                maxWidth = double.MinValue,
-                minHeight = double.MaxValue,
-                minWidth = double.MaxValue;
+            var points = new List<Point>();
 
-            foreach (var g in Plate.Profiles.SelectMany(p => p.Geometry))
-            {
-                if (g.Start.X > maxWidth)
-                {
-                    maxWidth = g.Start.X;
-                }
+            points.AddRange(Plate.Profiles.Where(p => p.Geometry != null).SelectMany(p => p.Geometry)
+                .Where(p => p.Start != null).Select(g => g.Start));
+            points.AddRange(Plate.Profiles.Where(p => p.Geometry != null).SelectMany(p => p.Geometry)
+                .Where(p => p.Center != null).Select(g => g.Center));
+            points.AddRange(Plate.Profiles.Where(p => p.Geometry != null).SelectMany(p => p.Geometry)
+                .Where(p => p.End != null).Select(g => g.End));
 
-                if (g.Start.X < minWidth)
-                {
-                    minWidth = g.Start.X;
-                }
+            points.AddRange(Remnants.SelectMany(r => r.Profiles).Where(p => p.Geometry != null)
+                .SelectMany(p => p.Geometry).Where(p => p.Start != null).Select(g => g.Start));
+            points.AddRange(Remnants.SelectMany(r => r.Profiles).Where(p => p.Geometry != null)
+                .SelectMany(p => p.Geometry).Where(p => p.Center != null).Select(g => g.Center));
+            points.AddRange(Remnants.SelectMany(r => r.Profiles).Where(p => p.Geometry != null)
+                .SelectMany(p => p.Geometry).Where(p => p.End != null).Select(g => g.End));
 
-                if (g.Start.Y > maxHeight)
-                {
-                    maxHeight = g.Start.Y;
-                }
+            points.AddRange(OriginalRemnants.SelectMany(r => r.Profiles).Where(p => p.Geometry != null)
+                .SelectMany(p => p.Geometry).Where(p => p.Start != null).Select(g => g.Start));
+            points.AddRange(OriginalRemnants.SelectMany(r => r.Profiles).Where(p => p.Geometry != null)
+                .SelectMany(p => p.Geometry).Where(p => p.Center != null).Select(g => g.Center));
+            points.AddRange(OriginalRemnants.SelectMany(r => r.Profiles).Where(p => p.Geometry != null)
+                .SelectMany(p => p.Geometry).Where(p => p.End != null).Select(g => g.End));
 
-                if (g.Start.Y < minHeight)
-                {
-                    minHeight = g.Start.Y;
-                }
+            points.AddRange(Texts.Select(t => t.ReferencePoint));
 
-                if (g.End.X > maxWidth)
-                {
-                    maxWidth = g.End.X;
-                }
+            var minX = points.Min(p => p.X);
+            var minY = points.Min(p => p.Y);
+            var maxX = points.Max(p => p.X);
+            var maxY = points.Max(p => p.Y);
 
-                if (g.End.X < minWidth)
-                {
-                    minWidth = g.End.X;
-                }
-
-                if (g.End.Y > maxHeight)
-                {
-                    maxHeight = g.End.Y;
-                }
-
-                if (g.End.Y < minHeight)
-                {
-                    minHeight = g.End.Y;
-                }
-            }
-
-            foreach (var g in Remnants.SelectMany(remnant => remnant.Profiles.SelectMany(p => p.Geometry)))
-            {
-                if (g.Start.X > maxWidth)
-                {
-                    maxWidth = g.Start.X;
-                }
-
-                if (g.Start.X < minWidth)
-                {
-                    minWidth = g.Start.X;
-                }
-
-                if (g.Start.Y > maxHeight)
-                {
-                    maxHeight = g.Start.Y;
-                }
-
-                if (g.Start.Y < minHeight)
-                {
-                    minHeight = g.Start.Y;
-                }
-
-                if (g.End.X > maxWidth)
-                {
-                    maxWidth = g.End.X;
-                }
-
-                if (g.End.X < minWidth)
-                {
-                    minWidth = g.End.X;
-                }
-
-                if (g.End.Y > maxHeight)
-                {
-                    maxHeight = g.End.Y;
-                }
-
-                if (g.End.Y < minHeight)
-                {
-                    minHeight = g.End.Y;
-                }
-            }
-
-            foreach (var g in OriginalRemnants.SelectMany(remnant => remnant.Profiles.SelectMany(p => p.Geometry)))
-            {
-                if (g.Start.X > maxWidth)
-                {
-                    maxWidth = g.Start.X;
-                }
-
-                if (g.Start.X < minWidth)
-                {
-                    minWidth = g.Start.X;
-                }
-
-                if (g.Start.Y > maxHeight)
-                {
-                    maxHeight = g.Start.Y;
-                }
-
-                if (g.Start.Y < minHeight)
-                {
-                    minHeight = g.Start.Y;
-                }
-
-                if (g.End.X > maxWidth)
-                {
-                    maxWidth = g.End.X;
-                }
-
-                if (g.End.X < minWidth)
-                {
-                    minWidth = g.End.X;
-                }
-
-                if (g.End.Y > maxHeight)
-                {
-                    maxHeight = g.End.Y;
-                }
-
-                if (g.End.Y < minHeight)
-                {
-                    minHeight = g.End.Y;
-                }
-            }
-
-            foreach (var g in Parts.SelectMany(part => part.Profiles.SelectMany(p => p.Geometry)))
-            {
-                if (g.Start.X > maxWidth)
-                {
-                    maxWidth = g.Start.X;
-                }
-
-                if (g.Start.X < minWidth)
-                {
-                    minWidth = g.Start.X;
-                }
-
-                if (g.Start.Y > maxHeight)
-                {
-                    maxHeight = g.Start.Y;
-                }
-
-                if (g.Start.Y < minHeight)
-                {
-                    minHeight = g.Start.Y;
-                }
-
-                if (g.End.X > maxWidth)
-                {
-                    maxWidth = g.End.X;
-                }
-
-                if (g.End.X < minWidth)
-                {
-                    minWidth = g.End.X;
-                }
-
-                if (g.End.Y > maxHeight)
-                {
-                    maxHeight = g.End.Y;
-                }
-
-                if (g.End.Y < minHeight)
-                {
-                    minHeight = g.End.Y;
-                }
-            }
-
-            foreach (var t in Texts)
-            {
-                if (t.ReferencePoint.X > maxWidth)
-                {
-                    maxWidth = t.ReferencePoint.X;
-                }
-
-                if (t.ReferencePoint.X < minWidth)
-                {
-                    minWidth = t.ReferencePoint.X;
-                }
-
-                if (t.ReferencePoint.Y > maxHeight)
-                {
-                    maxHeight = t.ReferencePoint.Y;
-                }
-
-                if (t.ReferencePoint.Y < minHeight)
-                {
-                    minHeight = t.ReferencePoint.Y;
-                }
-            }
-
-            var x = (int) Math.Ceiling(minWidth);
-            var y = (int) Math.Ceiling(minHeight);
-            var width = (int) Math.Ceiling(maxWidth - minWidth);
-            var height = (int) Math.Ceiling(maxHeight - minHeight);
-
-            return new Rectangle(x, y, width, height);
+            return new RectangleF(minX, minY, maxX - minX, maxY - minY);
         }
     }
 }

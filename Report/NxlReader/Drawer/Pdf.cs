@@ -9,10 +9,10 @@ namespace Report.NxlReader.Drawer
 {
     public class Pdf
     {
-        private PdfCanvas _c;
-
         private readonly string _consolas =
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), "consola.ttf");
+
+        private PdfCanvas _c;
 
         public void Draw(PdfCanvas c, Rectangle rect, Nest n)
         {
@@ -26,8 +26,8 @@ namespace Report.NxlReader.Drawer
 
             var tr = new AffineTransform();
 
-            float trX = Math.Abs(bb.X) * scale + rect.GetX();
-            float trY = rect.GetY() + (rect.GetHeight() / 2 - bb.Height * scale / 2);
+            var trX = -bb.X * scale + rect.GetX() + (rect.GetWidth() / 2 - bb.Width * scale / 2);
+            var trY = -bb.Y * scale + rect.GetY() + (rect.GetHeight() / 2 - bb.Height * scale / 2);
 
             tr.Translate(trX, trY);
             tr.Scale(scale, scale);
@@ -121,7 +121,7 @@ namespace Report.NxlReader.Drawer
 
         private void DrawArc(IElement e)
         {
-            var el = (Arc)e;
+            var el = (Arc) e;
 
             var x = el.Center.X - el.Radius;
             var y = el.Center.Y - el.Radius;
