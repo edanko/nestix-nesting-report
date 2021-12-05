@@ -4,9 +4,10 @@
 		<ApplicationIcon>1.ico</ApplicationIcon>
 		<Platforms>AnyCPU;x64</Platforms>
 		<OutputType>WinExe</OutputType>
-		<TargetFramework>net472</TargetFramework>
-		<SignAssembly>false</SignAssembly>
+		<TargetFramework>net6.0-windows</TargetFramework>
 		<LangVersion>latest</LangVersion>
+		<UseWPF>True</UseWPF>
+		<UseWindowsForms>True</UseWindowsForms>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 		<DefineConstants>$(DefineConstants)TRACE</DefineConstants>
@@ -21,29 +22,10 @@
 		<DefineConstants>$(DefineConstants)TRACE</DefineConstants>
 	</PropertyGroup>
 	<ItemGroup>
-		<ApplicationDefinition Include="App.xaml" />
-	</ItemGroup>
-	<ItemGroup>
 		<PackageReference Include="DeepCloner" Version="0.10.3"/>
 		<PackageReference Include="itext7" Version="7.2.1"/>
-		<PackageReference Include="SmartThreadPool.dll" Version="2.3.0"/>
 		<PackageReference Include="SvgNet" Version="2.2.2"/>
-	</ItemGroup>
-	<ItemGroup>
-		<Reference Include="System" />
-		<Reference Include="System.Core" />
-		<Reference Include="System.Data" />
-		<Reference Include="System.Web" />
-		<Reference Include="System.Xml" />
-		<Reference Include="System.Xaml">
-			<RequiredTargetFramework>4.0</RequiredTargetFramework>
-		</Reference>
-		<Reference Include="WindowsBase" />
-		<Reference Include="PresentationCore" />
-		<Reference Include="PresentationFramework" />
-	</ItemGroup>
-	<ItemGroup>
-		<Page Include="Launch.xaml" />
+		<PackageReference Include="System.Data.SqlClient" Version="4.8.3"/>
 	</ItemGroup>
 	<ItemGroup>
 		<None Update="1.ico">

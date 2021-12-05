@@ -9,14 +9,14 @@ namespace Report.NxlReader.Drawer
 {
     public class Pdf
     {
-        private readonly string _consolas =
+        private readonly string _fontPath =
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), "consola.ttf");
 
-        private PdfCanvas _c;
+        private PdfCanvas _pdfCanvas;
 
         public void Draw(PdfCanvas c, Rectangle rect, Nest n)
         {
-            _c = c;
+            _pdfCanvas = c;
 
             var bb = n.GetBBox();
 
@@ -31,7 +31,7 @@ namespace Report.NxlReader.Drawer
 
             tr.Translate(trX, trY);
             tr.Scale(scale, scale);
-            _c.ConcatMatrix(tr);
+            _pdfCanvas.ConcatMatrix(tr);
 
             DrawSheet(n.Plate);
 
@@ -113,10 +113,10 @@ namespace Report.NxlReader.Drawer
 
         private void DrawLine(IElement e)
         {
-            _c.MoveTo(e.Start.X, e.Start.Y);
-            _c.LineTo(e.End.X, e.End.Y);
-            _c.SetLineWidth(2);
-            _c.FillStroke();
+            _pdfCanvas.MoveTo(e.Start.X, e.Start.Y);
+            _pdfCanvas.LineTo(e.End.X, e.End.Y);
+            _pdfCanvas.SetLineWidth(2);
+            _pdfCanvas.FillStroke();
         }
 
         private void DrawArc(IElement e)
@@ -132,17 +132,17 @@ namespace Report.NxlReader.Drawer
 
             if (Math.Abs(sweepAngle) < 3 || el.Radius > 10000)
             {
-                _c.MoveTo(e.Start.X, e.Start.Y);
-                _c.LineTo(e.End.X, e.End.Y);
-                _c.SetLineWidth(2);
-                _c.FillStroke();
+                _pdfCanvas.MoveTo(e.Start.X, e.Start.Y);
+                _pdfCanvas.LineTo(e.End.X, e.End.Y);
+                _pdfCanvas.SetLineWidth(2);
+                _pdfCanvas.FillStroke();
 
                 return;
             }
 
-            _c.Arc(x, y, x + num, y + num, startAngle, sweepAngle);
-            _c.SetLineWidth(2);
-            _c.Stroke();
+            _pdfCanvas.Arc(x, y, x + num, y + num, startAngle, sweepAngle);
+            _pdfCanvas.SetLineWidth(2);
+            _pdfCanvas.Stroke();
         }
 
         private void DrawTextProfile(TextProfile t)
@@ -152,7 +152,7 @@ namespace Report.NxlReader.Drawer
                 return;
             }
 
-            var fontProgram = FontProgramFactory.CreateFont(_consolas);
+            var fontProgram = FontProgramFactory.CreateFont(_fontPath);
             var font = PdfFontFactory.CreateFont(fontProgram, PdfEncodings.IDENTITY_H,
                 PdfFontFactory.EmbeddingStrategy.PREFER_NOT_EMBEDDED);
 
@@ -162,17 +162,17 @@ namespace Report.NxlReader.Drawer
             {
                 var line = lines[i];
 
-                _c.BeginText();
-                _c.SetFontAndSize(font, t.Height);
+                _pdfCanvas.BeginText();
+                _pdfCanvas.SetFontAndSize(font, t.Height);
 
                 var m = new AffineTransform();
                 m.SetTransform(t.Matrix.M[0], t.Matrix.M[1], t.Matrix.M[3], t.Matrix.M[4], t.ReferencePoint.X,
                     t.ReferencePoint.Y - i * (t.Height + 2));
                 m.Rotate(t.Angle * Math.PI / 180);
-                _c.SetTextMatrix(m);
+                _pdfCanvas.SetTextMatrix(m);
 
-                _c.ShowText(line);
-                _c.EndText();
+                _pdfCanvas.ShowText(line);
+                _pdfCanvas.EndText();
             }
         }
 

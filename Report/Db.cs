@@ -15,11 +15,13 @@ namespace Report
 
             while (r.Read())
             {
-                var part = new Part();
-                part.Project = (string) r["Project"];
-                part.Section = (string) r["Section"];
+                var part = new Part
+                {
+                    Project = (string) r["Project"],
+                    Section = (string) r["Section"]
+                };
 
-                int.TryParse((string) r["DetailCode"], out var code);
+                _ = int.TryParse((string) r["DetailCode"], out var code);
 
                 part.DetailCode = code;
                 part.DetailCount = (int) r["DetailCount"];
@@ -98,17 +100,19 @@ namespace Report
             var r = c.ExecuteReader();
             while (r.Read())
             {
-                var masterData = new Nest();
-                masterData.Nxpathid = (int) r["nxpathid"];
-                masterData.Nxsheetpathid = (int) r["nxsheetpathid"];
-                masterData.NcName = (string) r["NcName"];
-                masterData.Machine = (string) r["Machine"];
-                masterData.Used = (float) r["Used"];
-                masterData.Info = (string) r["Info"];
-                masterData.NxlFile = (string) r["NxlFile"];
-                masterData.EmfImage = (string) r["EmfImage"];
-                masterData.RemnantArea = (double) r["RemnantArea"];
-                masterData.RemnantWeight = (double) r["RemnantWeight"];
+                var masterData = new Nest
+                {
+                    Nxpathid = (int) r["nxpathid"],
+                    Nxsheetpathid = (int) r["nxsheetpathid"],
+                    NcName = (string) r["NcName"],
+                    Machine = (string) r["Machine"],
+                    Used = (float) r["Used"],
+                    Info = (string) r["Info"],
+                    NxlFile = (string) r["NxlFile"],
+                    EmfImage = (string) r["EmfImage"],
+                    RemnantArea = (double) r["RemnantArea"],
+                    RemnantWeight = (double) r["RemnantWeight"]
+                };
                 all.Add(masterData);
             }
 
