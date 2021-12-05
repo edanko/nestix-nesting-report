@@ -331,20 +331,23 @@ namespace Report.NxlReader
             points.AddRange(Plate.Profiles.Where(p => p.Geometry != null).SelectMany(p => p.Geometry)
                 .Where(p => p.End != null).Select(g => g.End));
 
-            points.AddRange(Remnants.SelectMany(r => r.Profiles).Where(p => p.Geometry != null)
-                .SelectMany(p => p.Geometry).Where(p => p.Start != null).Select(g => g.Start));
-            points.AddRange(Remnants.SelectMany(r => r.Profiles).Where(p => p.Geometry != null)
-                .SelectMany(p => p.Geometry).Where(p => p.Center != null).Select(g => g.Center));
-            points.AddRange(Remnants.SelectMany(r => r.Profiles).Where(p => p.Geometry != null)
-                .SelectMany(p => p.Geometry).Where(p => p.End != null).Select(g => g.End));
+            // Parts may contain points outside the plate, so skip
+            // points.AddRange(Parts.SelectMany(p => p.Profiles).Where(p => p.Geometry != null).SelectMany(p => p.Geometry).Where(p => p.Start != null).Select(g => g.Start));
+            // points.AddRange(Parts.SelectMany(p => p.Profiles).Where(p => p.Geometry != null).SelectMany(p => p.Geometry).Where(p => p.Center != null).Select(g => g.Center));
+            // points.AddRange(Parts.SelectMany(p => p.Profiles).Where(p => p.Geometry != null).SelectMany(p => p.Geometry).Where(p => p.End != null).Select(g => g.End));
 
-            points.AddRange(OriginalRemnants.SelectMany(r => r.Profiles).Where(p => p.Geometry != null)
-                .SelectMany(p => p.Geometry).Where(p => p.Start != null).Select(g => g.Start));
-            points.AddRange(OriginalRemnants.SelectMany(r => r.Profiles).Where(p => p.Geometry != null)
-                .SelectMany(p => p.Geometry).Where(p => p.Center != null).Select(g => g.Center));
-            points.AddRange(OriginalRemnants.SelectMany(r => r.Profiles).Where(p => p.Geometry != null)
-                .SelectMany(p => p.Geometry).Where(p => p.End != null).Select(g => g.End));
+            // Assume remnants always inside the plate, so skip
+            // points.AddRange(Remnants.SelectMany(r => r.Profiles).Where(p => p.Geometry != null).SelectMany(p => p.Geometry).Where(p => p.Start != null).Select(g => g.Start));
+            // points.AddRange(Remnants.SelectMany(r => r.Profiles).Where(p => p.Geometry != null).SelectMany(p => p.Geometry).Where(p => p.Center != null).Select(g => g.Center));
+            // points.AddRange(Remnants.SelectMany(r => r.Profiles).Where(p => p.Geometry != null).SelectMany(p => p.Geometry).Where(p => p.End != null).Select(g => g.End));
 
+            // points.AddRange(OriginalRemnants.SelectMany(r => r.Profiles).Where(p => p.Geometry != null).SelectMany(p => p.Geometry).Where(p => p.Start != null).Select(g => g.Start));
+            // points.AddRange(OriginalRemnants.SelectMany(r => r.Profiles).Where(p => p.Geometry != null).SelectMany(p => p.Geometry).Where(p => p.Center != null).Select(g => g.Center));
+            // points.AddRange(OriginalRemnants.SelectMany(r => r.Profiles).Where(p => p.Geometry != null).SelectMany(p => p.Geometry).Where(p => p.End != null).Select(g => g.End));
+
+            // Texts on parts may be placed outside of profile
+            points.AddRange(Parts.SelectMany(t => t.Texts).Select(p => p.ReferencePoint));
+            // Texts usually placed under the plate
             points.AddRange(Texts.Select(t => t.ReferencePoint));
 
             var minX = points.Min(p => p.X);
