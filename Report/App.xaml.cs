@@ -5,8 +5,8 @@ using System.Data.SqlClient;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
-using Amib.Threading;
 using iText.IO.Font;
 using iText.Kernel.Font;
 using iText.Kernel.Pdf;
@@ -99,22 +99,14 @@ namespace Report
             launchWindow.ShowDialog();
             string launch = launchWindow.LaunchString;
 
-            var stp = new SmartThreadPool();
-
             var all = new ConcurrentDictionary<string, byte[]>();
 
-            foreach (var m in mdList.Where(m => m.Parts.Count != 0))
+            Parallel.ForEach(mdList.Where(m => m.Parts.Count != 0), (m) =>
             {
-                stp.QueueWorkItem(() =>
-                {
-                    var rep = new PdfReport();
-                    var bytes = rep.ProcessNest(m, launch);
-                    all.TryAdd(m.NcName, bytes);
-                });
-            }
-
-            stp.WaitForIdle();
-            stp.Shutdown();
+                var rep = new PdfReport();
+                var bytes = rep.ProcessNest(m, launch);
+                all.TryAdd(m.NcName, bytes);
+            });
 
             var sorted = all.OrderBy(x => x.Key);
 
