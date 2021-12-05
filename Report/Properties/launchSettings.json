@@ -6,18 +6,6 @@
       "workingDirectory": "E:\\nestix\\bin\\report",
       "sqlDebugging": true,
       "nativeDebugging": true
-    },
-    "Run Working Machine": {
-      "commandName": "Executable",
-      "executablePath": "\\\\bk-ssk-nestix01\\NxSC_Zvezda_Leader\\bin\\report\\report.exe",
-      "commandLineArgs":
-        "-PARAMS=21666,21667,21668,21669,21670,21671,21722,21673,21674,21675,21761,21762,21763,21764,21765,21766,21767,21768,21685,21686,21687,21688,21689,21690,21691,21693,21694,21695,21696,21697,21698,21699,21700,21702,21703,21704,21727,21728,21729,21730,21731,21733,21732,21734,21735,21736,21737,21738,21739,21740,21741,21742,21770,21743,21744,21745,21746,21747,21748,21769",
-      "workingDirectory": "\\\\bk-ssk-nestix01\\NxSC_Zvezda_Leader\\bin\\report\\",
-      "remoteDebugEnabled": true,
-      "sqlDebugging": true,
-      "remoteDebugMachine": "C33010704",
-      "authenticationMode": "Windows",
-      "nativeDebugging": true
     }
   }
 }
