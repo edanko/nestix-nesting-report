@@ -11,10 +11,13 @@ namespace Report
         public string Machine { get; set; }
         public string Info { get; set; }
         public float Used { get; set; }
+
         public string NxlFile { get; set; }
-        public string EmfImage { get; set; }
+
+        // public string EmfImage { get; set; }
         public double RemnantWeight { get; set; }
-        public double RemnantArea { get; set; }
+
+        // public double RemnantArea { get; set; }
         public List<Tool> Tools { get; set; }
         public Plate Plate { get; set; }
         public List<Part> Parts { get; set; }

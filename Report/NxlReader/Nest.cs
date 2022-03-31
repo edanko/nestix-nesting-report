@@ -16,7 +16,7 @@ namespace Report.NxlReader
         public List<Remnant> OriginalRemnants { get; set; } = new();
         public List<Part> Parts { get; set; } = new();
 
-        private List<Remnant> Remnants { get; set; } = new();
+        //private List<Remnant> Remnants { get; set; } = new();
 
         //public List<DimensionLineAnnotation> DimensionLineAnnotations = new();
         public List<TextProfile> Texts { get; set; } = new();
@@ -71,10 +71,10 @@ namespace Report.NxlReader
                     case "Part":
                         var part = new Part
                         {
-                            OrderlineInfo = p.Element("DbInfo").Element("ID").Value
+                            OrderlineInfo = p.Element("DbInfo")?.Element("ID")?.Value
                         };
 
-                        foreach (var node in p.Element("Elements").Elements())
+                        foreach (var node in p.Element("Elements")?.Elements()!)
                         {
                             if (node.Name.LocalName == "Profile")
                             {
@@ -84,7 +84,7 @@ namespace Report.NxlReader
                             }
                         }
 
-                        foreach (var node in p.Element("Texts").Elements())
+                        foreach (var node in p.Element("Texts")?.Elements()!)
                         {
                             if (node.Name.LocalName == "TextProfile")
                             {
@@ -99,7 +99,7 @@ namespace Report.NxlReader
                     case "Remnant":
                         var rem = new Remnant();
 
-                        foreach (var node in p.Element("Elements").Elements())
+                        foreach (var node in p.Element("Elements")?.Elements()!)
                         {
                             if (node.Name.LocalName == "Profile")
                             {
@@ -109,7 +109,7 @@ namespace Report.NxlReader
                             }
                         }
 
-                        foreach (var node in p.Element("Texts").Elements())
+                        foreach (var node in p.Element("Texts")?.Elements()!)
                         {
                             if (node.Name.LocalName == "TextProfile")
                             {
@@ -127,13 +127,13 @@ namespace Report.NxlReader
 
             #region PartInfos
 
-            foreach (var pi in elems.Element("PartInfos")?.Elements())
+            foreach (var pi in elems?.Element("PartInfos")?.Elements()!)
             {
                 switch (pi.Name.LocalName)
                 {
                     case "PartInfo":
-                        var orderlineInfo = pi.Element("DbInfo")?.Element("ID")?.Value;
-                        var op = originalParts.Find(x => x.OrderlineInfo == orderlineInfo).DeepClone();
+                        var id = pi.Element("DbInfo")?.Element("ID")?.Value;
+                        var op = originalParts.Find(x => x.OrderlineInfo == id).DeepClone();
                         if (op == null)
                         {
                             continue;
@@ -168,7 +168,7 @@ namespace Report.NxlReader
                         Parts.Add(p);
                         break;
 
-                    case "RemnantInfo":
+                    /*case "RemnantInfo":
                         var rem = new Remnant()
                         {
                             Matrix = Matrix33.Read(pi.Element("Matrix"))
@@ -189,7 +189,7 @@ namespace Report.NxlReader
                         }
 
                         Remnants.Add(rem);
-                        break;
+                        break;*/
                 }
             }
 

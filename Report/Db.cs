@@ -109,8 +109,8 @@ namespace Report
                     Used = (float) r["Used"],
                     Info = (string) r["Info"],
                     NxlFile = (string) r["NxlFile"],
-                    EmfImage = (string) r["EmfImage"],
-                    RemnantArea = (double) r["RemnantArea"],
+                    // EmfImage = (string) r["EmfImage"],
+                    // RemnantArea = (double) r["RemnantArea"],
                     RemnantWeight = (double) r["RemnantWeight"]
                 };
                 all.Add(masterData);
@@ -138,10 +138,10 @@ namespace Report
   nxsheetpath.nxused AS Used,
   ISNULL(nxpath.nxpathinfo, '') AS Info,
   nxpath.nxpthfilename AS NxlFile,
-  nxpath.nxpthmetafile AS EmfImage,
+  --nxpath.nxpthmetafile AS EmfImage,
 
-  ISNULL((SELECT SUM(remnant.nxprarea) * nxproduct.nxprthick * nxproduct.nxprdensity FROM nxsheetpathdet as spd with (nolock) inner join nxproduct as remnant with (nolock) on spd.nxproductid = remnant.nxproductid WHERE spd.nxsheetpathid = nxsheetpath.nxsheetpathid), 0) as RemnantWeight,
-  ISNULL((SELECT SUM(remnant.nxprarea) FROM nxsheetpathdet as spd with (nolock) inner join nxproduct as remnant with (nolock) on spd.nxproductid = remnant.nxproductid WHERE spd.nxsheetpathid = nxsheetpath.nxsheetpathid), 0) as RemnantArea
+  ISNULL((SELECT SUM(remnant.nxprarea) * nxproduct.nxprthick * nxproduct.nxprdensity FROM nxsheetpathdet as spd with (nolock) inner join nxproduct as remnant with (nolock) on spd.nxproductid = remnant.nxproductid WHERE spd.nxsheetpathid = nxsheetpath.nxsheetpathid), 0) as RemnantWeight
+  --ISNULL((SELECT SUM(remnant.nxprarea) FROM nxsheetpathdet as spd with (nolock) inner join nxproduct as remnant with (nolock) on spd.nxproductid = remnant.nxproductid WHERE spd.nxsheetpathid = nxsheetpath.nxsheetpathid), 0) as RemnantArea
 FROM
   nxpath with (nolock)
   INNER JOIN nxsheetpath with (nolock) ON nxsheetpath.nxpathid = nxpath.nxpathid
