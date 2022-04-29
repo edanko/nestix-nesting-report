@@ -22,7 +22,7 @@
 		<DefineConstants>$(DefineConstants)TRACE</DefineConstants>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="DeepCloner" Version="0.10.3"/>
+		<PackageReference Include="DeepCloner" Version="0.10.4"/>
 		<PackageReference Include="itext7" Version="7.2.2"/>
 		<PackageReference Include="SvgNet" Version="2.2.2"/>
 		<PackageReference Include="System.Data.SqlClient" Version="4.8.3"/>
