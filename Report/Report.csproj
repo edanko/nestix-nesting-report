@@ -25,7 +25,7 @@
 		<PackageReference Include="DeepCloner" Version="0.10.4"/>
 		<PackageReference Include="itext7" Version="7.2.5"/>
 		<PackageReference Include="SvgNet" Version="3.3.3"/>
-		<PackageReference Include="System.Data.SqlClient" Version="4.8.5"/>
+		<PackageReference Include="System.Data.SqlClient" Version="4.8.6"/>
 	</ItemGroup>
 	<ItemGroup>
 		<None Update="1.ico">
